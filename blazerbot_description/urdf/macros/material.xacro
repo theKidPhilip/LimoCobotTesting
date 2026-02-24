@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+File: material.xacro
+Project: Blazerbot Description (CS353 Lab 3)
+File Created: Monday, 17th February 2026
+Author: Zabdiel Addo
+Email: zabdiel.addo@ashesi.edu.gh
+Version: 1.0.0
+Brief: Xacro material definitions (colors) for the Blazerbot (LIMO Agile X)
+       URDF model used in Lab 3 simulation.
+~~~~~
+Last Modified: Sunday, 22nd February 2026 8:36:28 PM
+Modified By: Philip Quartey
+~~~~~
+Copyright ©2026 Zabdiel Addo. All rights reserved.
+-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Matte dark chassis -->
+    <material name="chassis_dark">
+        <color rgba="0.15 0.15 0.15 1" />
+    </material>
+
+    <!-- Metallic silver (wheel hubs, bolts) -->
+    <material name="metal_silver">
+        <color rgba="0.7 0.7 0.7 1" />
+    </material>
+
+    <!-- Rubber black (tires) -->
+    <material name="rubber_black">
+        <color rgba="0.05 0.05 0.05 1" />
+    </material>
+
+    <!-- LIMO blue accent -->
+    <material name="limo_blue">
+        <color rgba="0.1 0.2 0.8 1" />
+    </material>
+
+    <!-- Sensor housing (LiDAR top cap) -->
+    <material name="sensor_black">
+        <color rgba="0.1 0.1 0.1 1" />
+    </material>
+
+    <!-- Transparent / debug -->
+    <material name="transparent">
+        <color rgba="0 0 0 0" />
+    </material>
+
+</robot>

@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!--
+File: blazerbot_core.xacro
+Project: Blazerbot Description (CS353 Lab 3)
+Author: Zabdiel Addo
+Email: zabdiel.addo@ashesi.edu.gh
+Version: 1.0.1
+Brief: Core robot model for Blazerbot (LIMO Agile X base): chassis + 4-wheel diff drive.
+       NOTE: LiDAR is defined in urdf/sensors/lidar.xacro as a macro.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="BLAZERBOT_PACKAGE_NAME" value="blazerbot_description" />
+
+    <xacro:include filename="$(find ${BLAZERBOT_PACKAGE_NAME})/urdf/macros/material.xacro" />
+    <xacro:include filename="$(find ${BLAZERBOT_PACKAGE_NAME})/urdf/macros/inertial.xacro" />
+    <xacro:include filename="$(find ${BLAZERBOT_PACKAGE_NAME})/urdf/macros/wheels_diff_drive.xacro" />
+
+    <!-- Specs -->
+    <xacro:property name="chassis_length" value="0.322" />
+    <xacro:property name="chassis_width" value="0.220" />
+    <xacro:property name="chassis_height" value="0.12" />  
+    <xacro:property name="chassis_mass" value="4.8" />
+
+    <xacro:property name="ground_clearance" value="0.024" />
+    <xacro:property name="wheelbase" value="0.200" />
+    <xacro:property name="track_width" value="0.175" />
+
+    <xacro:property name="wheel_radius" value="0.055" />  
+    <xacro:property name="wheel_width" value="0.035" />
+    <xacro:property name="wheel_mass" value="0.30" />
+
+    <!-- base_link at wheel center plane -->
+    <link name="base_link" />
+
+    <!-- Chassis above base_link -->
+    <xacro:property name="chassis_z_from_base"
+        value="${ground_clearance + chassis_height/2 - wheel_radius}" />
+
+    <joint name="chassis_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="chassis" />
+        <origin xyz="0 0 ${chassis_z_from_base}" rpy="0 0 0" />
+    </joint>
+
+    <link name="chassis">
+        <visual name="chassis_visual">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="${chassis_length} ${chassis_width} ${chassis_height}" />
+            </geometry>
+            <material name="chassis_dark" />
+        </visual>
+
+        <collision name="chassis_collision">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="${chassis_length} ${chassis_width} ${chassis_height}" />
+            </geometry>
+        </collision>
+
+        <xacro:box_inertial prefix="chassis"
+            mass="${chassis_mass}"
+            x="${chassis_length}" y="${chassis_width}" z="${chassis_height}">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </xacro:box_inertial>
+    </link>
+
+    <gazebo reference="chassis">
+        <material>Gazebo/Black</material>
+    </gazebo>
+
+    <!-- Wheels attached to base_link -->
+    <xacro:diff_drive_wheels
+        parent_link="base_link"
+        wheel_radius="${wheel_radius}"
+        wheel_width="${wheel_width}"
+        wheel_mass="${wheel_mass}"
+        wheelbase="${wheelbase}"
+        track_width="${track_width}" />
+
+</robot>

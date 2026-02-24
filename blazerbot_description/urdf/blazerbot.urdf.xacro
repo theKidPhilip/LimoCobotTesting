@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+File: blazerbot.urdf.xacro
+Project: Blazerbot Description
+Author: Zabdiel Addo
+Email: zabdiel.addo@ashesi.edu.gh
+Version: 1.0.0
+Brief: Main entry xacro. Core always; Gazebo control + LiDAR only when sim_mode=true.
+-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="blazerbot">
+
+    <xacro:property name="BLAZERBOT_PACKAGE_NAME" value="blazerbot_description" />
+    <xacro:arg name="sim_mode" default="true" />
+
+    <!-- Core robot -->
+    <xacro:include filename="$(find ${BLAZERBOT_PACKAGE_NAME})/urdf/blazerbot_core.xacro" />
+
+    <!-- Sim-only: gazebo control + lidar sensor -->
+    <xacro:if value="$(arg sim_mode)">
+
+        <xacro:include
+            filename="$(find ${BLAZERBOT_PACKAGE_NAME})/urdf/control/gazebo_control.xacro" />
+        <xacro:include filename="$(find ${BLAZERBOT_PACKAGE_NAME})/urdf/sensors/lidar.xacro" />
+
+        <!-- Mount LiDAR on top-center of chassis -->
+        <xacro:lidar parent_link="chassis">
+            <origin xyz="0.10 0 ${chassis_height/2 + 0.05}" rpy="0 0 0" />
+        </xacro:lidar>
+
+    </xacro:if>
+
+</robot>

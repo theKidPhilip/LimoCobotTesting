@@ -1,0 +1,12 @@
+# File: blazerbot_description.sh.in
+# Project: blazerbot_description
+# File Created: Monday, 17th February 2026
+# Author: Zabdiel Addo
+# Email: zabdiel.addo@ashesi.edu.gh
+# Version: 1.0.0
+# Brief: Hook to add the share directory to the Gazebo Sim resource path
+# ------------------------------------------------
+# Copyright ©2026 Zabdiel Addo
+#
+
+ament_prepend_unique_value GZ_SIM_RESOURCE_PATH "$AMENT_CURRENT_PREFIX/share/@PROJECT_NAME@"

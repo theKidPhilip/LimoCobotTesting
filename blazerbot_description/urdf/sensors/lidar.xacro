@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<!--
+File: lidar.xacro
+Project: Blazerbot Description (CS353 Lab 3)
+File Created: Tuesday, 17th February 2026
+Author: Zabdiel Addo
+Email: zabdiel.addo@ashesi.edu.gh
+Version: 1.1.0
+Brief: Implements a LiDAR sensor for the Blazerbot (LIMO Agile X) URDF model.
+       Publishes LaserScan data in Gazebo on the "scan" topic for wall following.
+~~~~~
+Last Modified: Tuesday, 24th February 2026 5:26:33 PM
+Modified By: Philip Quartey
+~~~~~
+Copyright ©2025 Zabdiel Addo. All rights reserved.
+-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="PI" value="3.14159" />
+    <xacro:property name="BLAZERBOT_PACKAGE_NAME" value="blazerbot_description" />
+    <xacro:include filename="$(find ${BLAZERBOT_PACKAGE_NAME})/urdf/macros/inertial.xacro" />
+
+    <!--
+      Macro: lidar
+      parent_link: link we mount lidar to "chassis"
+    -->
+    <xacro:macro name="lidar" params="parent_link *joint_pose">
+
+        <!-- Approx physical size/mass -->
+        <xacro:property name="lidar_length" value="0.0556" />
+        <xacro:property name="lidar_width" value="0.0556" />
+        <xacro:property name="lidar_height" value="0.0413" />
+        <xacro:property name="lidar_mass" value="0.11" />
+        <xacro:property name="lidar_mesh_scale" value="0.015" />
+
+        <!-- LiDAR mesh orientation (radians) -->
+        <xacro:property name="lidar_mesh_roll" value="0.0" />
+        <xacro:property name="lidar_mesh_pitch" value="0.0" />
+        <xacro:property name="lidar_mesh_yaw" value="1.5708" />
+
+        <xacro:property name="lidar_mesh_x_offset" value="0.0" />
+        <xacro:property name="lidar_mesh_y_offset" value="0.0" />
+        <xacro:property name="lidar_mesh_z_offset" value="-0.015" />
+
+        <!-- Mount/holder dimensions -->
+        <xacro:property name="mount_size_x" value="0.06" />
+        <xacro:property name="mount_size_y" value="0.06" />
+        <xacro:property name="mount_thickness" value="0.006" />
+        <xacro:property name="mount_mass" value="0.05" />
+        <xacro:property name="lidar_sensor_origin" value="0.0298" />
+
+        <!-- Mount link on parent -->
+        <joint name="lidar_mount_joint" type="fixed">
+            <parent link="${parent_link}" />
+            <child link="lidar_mount_link" />
+            <xacro:insert_block name="joint_pose" />
+        </joint>
+
+        <link name="lidar_mount_link">
+            <visual name="lidar_mount_visual">
+                <origin xyz="0 0 ${mount_thickness/2}" rpy="0 0 0" />
+                <geometry>
+                    <box size="${mount_size_x} ${mount_size_y} ${mount_thickness}" />
+                </geometry>
+                <material name="metal_silver" />
+            </visual>
+
+            <collision name="lidar_mount_collision">
+                <origin xyz="0 0 ${mount_thickness/2}" rpy="0 0 0" />
+                <geometry>
+                    <box size="${mount_size_x} ${mount_size_y} ${mount_thickness}" />
+                </geometry>
+            </collision>
+
+            <xacro:box_inertial
+                prefix="lidar_mount"
+                mass="${mount_mass}"
+                x="${mount_size_x}"
+                y="${mount_size_y}"
+                z="${mount_thickness}">
+                <origin xyz="0 0 ${mount_thickness/2}" rpy="0 0 0" />
+            </xacro:box_inertial>
+        </link>
+
+        <!-- Laser link sits on mount -->
+        <joint name="lidar_joint" type="fixed">
+            <parent link="lidar_mount_link" />
+            <child link="laser_link" />
+            <origin xyz="0 0 ${mount_thickness}" rpy="0 0 0" />
+        </joint>
+
+        <!-- LiDAR housing link -->
+        <link name="laser_link">
+            <visual name="laser_visual">
+                <origin xyz="${lidar_mesh_x_offset} ${lidar_mesh_y_offset} ${lidar_mesh_z_offset}"
+                    rpy="${lidar_mesh_roll} ${lidar_mesh_pitch} ${lidar_mesh_yaw}" />
+                <geometry>
+                    <mesh filename="package://${BLAZERBOT_PACKAGE_NAME}/meshes/lidar/lidar.dae"
+                        scale="${lidar_mesh_scale} ${lidar_mesh_scale} ${lidar_mesh_scale}" />
+                </geometry>
+            </visual>
+
+            <collision name="laser_collision">
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder radius="0.03" length="0.05" />
+                </geometry>
+            </collision>
+
+            <xacro:box_inertial
+                prefix="laser"
+                mass="${lidar_mass}"
+                x="${lidar_length}"
+                y="${lidar_width}"
+                z="${lidar_height}">
+                <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0" />
+            </xacro:box_inertial>
+        </link>
+
+       <!---->
+        <gazebo reference="laser_link">
+            <sensor name="lidar_sensor" type="gpu_lidar">
+                <pose>0 0 ${lidar_sensor_origin} 0 0 0</pose>
+                <always_on>true</always_on>
+                <visualize>true</visualize>
+                <update_rate>10</update_rate>
+
+                <lidar>
+                    <scan>
+                        <horizontal>
+                            <samples>720</samples>
+                            <resolution>1</resolution>
+                            <min_angle>-${PI}</min_angle>
+                            <max_angle>${PI}</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.05</min>
+                        <max>6.0</max>
+                        <resolution>0.01</resolution>
+                    </range>
+                    <noise>
+                        <type>gaussian</type>
+                        <mean>0.0</mean>
+                        <stddev>0.01</stddev>
+                    </noise>
+                </lidar>
+
+                <topic>scan</topic>
+                <gz_frame_id>laser_link</gz_frame_id>
+            </sensor>
+        </gazebo>
+ 
+
+    </xacro:macro>
+
+</robot>

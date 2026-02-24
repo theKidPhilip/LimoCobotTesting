@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+File: gazebo_control.xacro
+Project: Blazerbot Description (CS353 Lab 3)
+Author: Zabdiel Addo
+Email: zabdiel.addo@ashesi.edu.gh
+Version: 1.0.0
+Brief: Gazebo control plugins for the Blazerbot (LIMO Agile X) using differential drive.
+       Subscribes to cmd_vel and publishes odom + tf in Gazebo for bridging to ROS 2.
+~~~~~
+Last Modified: Tuesday, 17th February 2026 9:51:48 AM
+Modified By: Zabdiel Addo
+~~~~~
+Copyright ©2025 Zabdiel Addo. All rights reserved.
+-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <gazebo>
+
+        <!-- Differential Drive System -->
+        <plugin name="gz::sim::systems::DiffDrive"
+            filename="gz-sim-diff-drive-system">
+
+            <!-- Left wheels -->
+            <left_joint>front_left_wheel_joint</left_joint>
+            <left_joint>rear_left_wheel_joint</left_joint>
+
+            <!-- Right wheels -->
+            <right_joint>front_right_wheel_joint</right_joint>
+            <right_joint>rear_right_wheel_joint</right_joint>
+
+            <!-- Geometry -->
+            <wheel_separation>${track_width}</wheel_separation>
+            <wheel_radius>${wheel_radius}</wheel_radius>
+
+            <!-- Input topic inside Gazebo -->
+            <topic>cmd_vel</topic>
+
+            <!-- Output topics inside Gazebo -->
+            <odom_topic>odom</odom_topic>
+            <tf_topic>tf</tf_topic>
+
+            <!-- Frames -->
+            <frame_id>odom</frame_id>
+            <child_frame_id>base_link</child_frame_id>
+
+            <odom_publish_frequency>50</odom_publish_frequency>
+        </plugin>
+
+        <!-- Optional: Joint State Publisher
+         Only keep this if you actually need /joint_states for RViz or debugging.
+    -->
+        <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+            <topic>joint_states</topic>
+
+            <joint_name>front_left_wheel_joint</joint_name>
+            <joint_name>front_right_wheel_joint</joint_name>
+            <joint_name>rear_left_wheel_joint</joint_name>
+            <joint_name>rear_right_wheel_joint</joint_name>
+        </plugin>
+
+    </gazebo>
+
+</robot>

@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!--
+File: wheels_diff_drive.xacro
+Project: Blazerbot Description (CS353 Lab 3)
+Author: Zabdiel Addo
+Email: zabdiel.addo@ashesi.edu.gh
+Version: 1.0.1
+Brief: Xacro macros for defining a 4-wheel differential drive wheel assembly
+       for the Blazerbot (LIMO Agile X) URDF model.
+~~~~~
+Last Modified: Sunday, 22nd February 2026 9:53:05 PM
+Modified By: Philip Quartey
+Copyright ©2025 Zabdiel Addo. All rights reserved.
+-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="BLAZERBOT_PACKAGE_NAME" value="blazerbot_description" />
+    <xacro:include filename="$(find ${BLAZERBOT_PACKAGE_NAME})/urdf/macros/inertial.xacro" />
+
+    <xacro:macro name="wheel_link" params="name radius width mass material_name">
+        <link name="${name}">
+            <visual>
+                <origin xyz="0 0 0" rpy="1.5708 0 0" />
+                <geometry>
+                    <cylinder radius="${radius}" length="${width}" />
+                </geometry>
+                <material name="${material_name}" />
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="1.5708 0 0" />
+                <geometry>
+                    <cylinder radius="${radius}" length="${width}" />
+                </geometry>
+            </collision>
+            <xacro:cylinder_inertial prefix="${name}" mass="${mass}" radius="${radius}"
+                length="${width}">
+                <origin xyz="0 0 0" rpy="0 0 0" />
+            </xacro:cylinder_inertial>
+        </link>
+
+        <gazebo reference="${name}">
+            <material>Gazebo/Black</material>
+            <mu1>1.0</mu1>
+            <mu2>1.0</mu2>
+            <kp>1000000.0</kp>
+            <kd>1.0</kd>
+            <minDepth>0.001</minDepth>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:macro name="diff_drive_wheels"
+        params="parent_link wheel_radius wheel_width wheel_mass wheelbase track_width">
+
+        <xacro:property name="wheel_clearance" value="0.025" />
+        <xacro:property name="wheel_y" value="${track_width/2 + wheel_width/2 + wheel_clearance}" />
+
+        <!-- Front Left -->
+        <xacro:wheel_link
+            name="front_left_wheel_link"
+            radius="${wheel_radius}"
+            width="${wheel_width}"
+            mass="${wheel_mass}"
+            material_name="limo_blue" />
+        <joint name="front_left_wheel_joint" type="continuous">
+            <parent link="${parent_link}" />
+            <child link="front_left_wheel_link" />
+            <origin xyz="${wheelbase/2} ${wheel_y} 0" rpy="0 0 0" />
+            <axis xyz="0 1 0" />
+        </joint>
+
+        <!-- Front Right -->
+        <xacro:wheel_link
+            name="front_right_wheel_link"
+            radius="${wheel_radius}"
+            width="${wheel_width}"
+            mass="${wheel_mass}"
+            material_name="limo_blue" />
+        <joint name="front_right_wheel_joint" type="continuous">
+            <parent link="${parent_link}" />
+            <child link="front_right_wheel_link" />
+            <origin xyz="${wheelbase/2} -${wheel_y} 0" rpy="0 0 0" />
+            <axis xyz="0 1 0" />
+        </joint>
+
+        <!-- Rear Left -->
+        <xacro:wheel_link
+            name="rear_left_wheel_link"
+            radius="${wheel_radius}"
+            width="${wheel_width}"
+            mass="${wheel_mass}"
+            material_name="limo_blue" />
+        <joint name="rear_left_wheel_joint" type="continuous">
+            <parent link="${parent_link}" />
+            <child link="rear_left_wheel_link" />
+            <origin xyz="-${wheelbase/2} ${wheel_y} 0" rpy="0 0 0" />
+            <axis xyz="0 1 0" />
+        </joint>
+
+        <!-- Rear Right -->
+        <xacro:wheel_link
+            name="rear_right_wheel_link"
+            radius="${wheel_radius}"
+            width="${wheel_width}"
+            mass="${wheel_mass}"
+            material_name="limo_blue" /> <!--Using blue for the wheels-->
+        <joint name="rear_right_wheel_joint" type="continuous">
+            <parent link="${parent_link}" />
+            <child link="rear_right_wheel_link" />
+            <origin xyz="-${wheelbase/2} -${wheel_y} 0" rpy="0 0 0" />
+            <axis xyz="0 1 0" />
+        </joint>
+
+    </xacro:macro>
+
+
+</robot>
