@@ -27,3 +27,13 @@ export ROS_DOMAIN_ID=41
 ros2 topic echo /scan --once
 
 If /scan prints, you’re good.
+
+
+    # 2) Gate: wait for 'S' then start the wall follower
+    arm_and_run = Node(
+        package="blazerbot_bringup",
+        executable="arm_then_run_wall_follower.py",
+        name="arm_then_run_wall_follower",
+        output="screen",
+    )
+    

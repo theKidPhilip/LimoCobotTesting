@@ -1,0 +1,281 @@
+import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+#from launch.actions import DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import Command
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    rf2o_dir = get_package_share_directory('rf2o_laser_odometry')
+    limo_description_dir = get_package_share_directory('limo_description')
+    ydlidar_ros_dir = get_package_share_directory("ydlidar_ros2_driver")
+    limo_base_dir = get_package_share_directory('limo_base')
+    # limo_bringup_dir = get_package_share_directory('limo_bringup')
+    # limo_gazebo = get_package_share_directory('limo_car')
+
+    # URDF
+    urdf_file = os.path.join(limo_description_dir, 'urdf', 'limo_ackerman.xacro')
+    robot_description = Command(['xacro ', urdf_file])
+    
+    # Nodes
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'robot_description': robot_description
+            }]
+    )
+
+    joint_state_publisher_node = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher',
+        output='screen'
+    )
+
+    # static TFs
+    base_footprint_to_base_link_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='base_footprint_to_base_link_tf',
+        arguments=['0', '0', '0.15', '0', '0', '0', 'base_footprint', 'base_link'],
+        output='screen'
+    )
+
+    base_link_to_laser_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='base_link_to_laser_tf',
+        arguments=['0.18','0','0.0','0','0','0','1','base_link','laser_link'],
+        output='screen'
+    )
+    
+    base_link_to_camera_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='base_link_to_camera_tf',
+        arguments=['0.18','0','0.18','0','0','0','1','base_link','camera_link'],
+        output='screen'
+    )
+    
+    base_link_to_imu_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='base_link_to_imu_tf',
+        arguments=['0','0','0','0','0','0','1','base_link','imu_link'],
+        output='screen'
+    )
+    
+    ld = LaunchDescription()
+    # publish URDF and joint states first
+    ld.add_action(robot_state_publisher_node)
+    ld.add_action(joint_state_publisher_node)
+    ld.add_action(base_footprint_to_base_link_tf)
+
+    # Add static transforms
+    ld.add_action(base_link_to_laser_tf_node)
+    ld.add_action(base_link_to_camera_tf_node)
+    ld.add_action(base_link_to_imu_tf_node)
+
+    # Include limo_base
+    ld.add_action(
+    	IncludeLaunchDescription(
+    	    PythonLaunchDescriptionSource([limo_base_dir, '/launch', '/limo_base.launch.py'])
+    	)
+    )
+    
+    # Include YDLIDAR driver
+    ld.add_action(
+    	IncludeLaunchDescription(
+    	    PythonLaunchDescriptionSource([ydlidar_ros_dir, '/launch', '/ydlidar_launch.py'])
+    	)
+    )
+
+    return ld
+
+
+development/ros/ros2_ws took 46.0s …
+➜ colcon build --packages-select blazerbot_bringup limo_bringup wall_follower
+Starting >>> wall_follower
+Starting >>> limo_bringup
+Finished <<< limo_bringup [0.80s]                                                     
+Finished <<< wall_follower [2.24s]          
+Starting >>> blazerbot_bringup
+Finished <<< blazerbot_bringup [0.20s]                  
+
+Summary: 3 packages finished [3.17s]
+
+development/ros/ros2_ws took 3.8s …
+➜ source ~/development/ros/ros2_ws/install/setup.zsh
+
+development/ros/ros2_ws …
+➜ ros2 launch blazerbot_bringup robot_bringup.launch.py                      
+[INFO] [launch]: All log files can be found below /home/limo/.ros/log/2026-02-24-23-41-54-973926-ashlimo01-34367
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [limo_base-7]: process started with pid [34427]
+[INFO] [ydlidar_ros2_driver_node-8]: process started with pid [34434]
+[INFO] [robot_state_publisher-1]: process started with pid [34395]
+[INFO] [joint_state_publisher-2]: process started with pid [34397]
+[INFO] [static_transform_publisher-3]: process started with pid [34399]
+[INFO] [static_transform_publisher-4]: process started with pid [34401]
+[INFO] [static_transform_publisher-5]: process started with pid [34403]
+[INFO] [static_transform_publisher-6]: process started with pid [34405]
+[INFO] [arm_then_run_wall_follower.py-9]: process started with pid [34452]
+[static_transform_publisher-3] [WARN] [1771976515.554303176] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-3] [INFO] [1771976515.595526824] [base_footprint_to_base_link_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.150000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'base_footprint' to 'base_link'
+[static_transform_publisher-4] [WARN] [1771976515.555583304] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-5] [WARN] [1771976515.565768264] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-6] [WARN] [1771976515.596803112] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-4] [INFO] [1771976515.629335496] [base_link_to_laser_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-4] translation: ('0.180000', '0.000000', '0.000000')
+[static_transform_publisher-4] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-4] from 'base_link' to 'laser_link'
+[arm_then_run_wall_follower.py-9] 
+[arm_then_run_wall_follower.py-9] [blazerbot_bringup] LIMO is up. Press 'enter' to START wall following.
+[arm_then_run_wall_follower.py-9] [blazerbot_bringup] Press 'Q' to quit.
+[arm_then_run_wall_follower.py-9] 
+[static_transform_publisher-5] [INFO] [1771976515.700883112] [base_link_to_camera_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-5] translation: ('0.180000', '0.000000', '0.180000')
+[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-5] from 'base_link' to 'camera_link'
+[limo_base-7] Loading parameters: 
+[limo_base-7] - port name: ttyTHS1
+[limo_base-7] - odom frame name: odom
+[limo_base-7] - base frame name: base_link
+[limo_base-7] - odom topic name: 1
+[limo_base-7] - use_mcnamu_: 0
+[static_transform_publisher-6] [INFO] [1771976515.766297096] [base_link_to_imu_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-6] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-6] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-6] from 'base_link' to 'imu_link'
+[ydlidar_ros2_driver_node-8] [INFO] [1771976515.779501960] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Current ROS Driver Version: 1.0.1
+[ydlidar_ros2_driver_node-8] 
+[limo_base-7] [INFO] [1771976515.785361832] [limo_base]: connet the serial port:'/dev/ttyTHS1'
+[limo_base-7] [INFO] [1771976515.795809128] [limo_base]: enableCommandedMode :
+[limo_base-7] [INFO] [1771976515.797213800] [limo_base]: Open the serial port:'/dev/ttyTHS1'
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK initializing
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK has been initialized
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK Version: 1.2.7
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] [INFO] [1771976515.813257448] [robot_state_publisher]: got segment base_footprint
+[robot_state_publisher-1] [INFO] [1771976515.813596008] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-1] [INFO] [1771976515.813629512] [robot_state_publisher]: got segment depth_camera_link
+[robot_state_publisher-1] [INFO] [1771976515.813642472] [robot_state_publisher]: got segment depth_link
+[robot_state_publisher-1] [INFO] [1771976515.813652360] [robot_state_publisher]: got segment front_left_wheel_link
+[robot_state_publisher-1] [INFO] [1771976515.813661640] [robot_state_publisher]: got segment front_right_wheel_link
+[robot_state_publisher-1] [INFO] [1771976515.813670760] [robot_state_publisher]: got segment imu_link
+[robot_state_publisher-1] [INFO] [1771976515.813679112] [robot_state_publisher]: got segment inertial_link
+[robot_state_publisher-1] [INFO] [1771976515.813687560] [robot_state_publisher]: got segment laser_link
+[robot_state_publisher-1] [INFO] [1771976515.813695944] [robot_state_publisher]: got segment left_steering_hinge
+[robot_state_publisher-1] [INFO] [1771976515.813704232] [robot_state_publisher]: got segment rear_left_wheel_link
+[robot_state_publisher-1] [INFO] [1771976515.813712872] [robot_state_publisher]: got segment rear_right_wheel_link
+[robot_state_publisher-1] [INFO] [1771976515.813721992] [robot_state_publisher]: got segment right_steering_hinge
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar successfully connected [/dev/ttyUSB0:230400]
+[joint_state_publisher-2] [INFO] [1771976516.470939336] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar running correctly! The health status: good
+[ydlidar_ros2_driver_node-8] Current Lidar Model Code 151
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Baseplate device info
+[ydlidar_ros2_driver_node-8] Firmware version: 1.2
+[ydlidar_ros2_driver_node-8] Hardware version: 1
+[ydlidar_ros2_driver_node-8] Model: Tmini Plus
+[ydlidar_ros2_driver_node-8] Serial: 2024092600090187
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 977 ms
+
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0x73FFE8E0
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2097 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Scan Frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Fixed Size: 400
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Sample Rate: 4.00K
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to check the lidar, Elapsed time 0 ms
+[ydlidar_ros2_driver_node-8] [2026-02-24 23:41:58][info] [YDLIDAR] Now lidar is scanning...
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[static_transform_publisher-5] [INFO] [1771976648.011923784] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [arm_then_run_wall_follower.py-9]: process has died [pid 34452, exit code -2, cmd '/home/limo/development/ros/ros2_ws/install/blazerbot_bringup/lib/blazerbot_bringup/arm_then_run_wall_follower.py --ros-args -r __node:=arm_then_run_wall_follower'].
+[INFO] [static_transform_publisher-4]: process has finished cleanly [pid 34401]
+[INFO] [static_transform_publisher-6]: process has finished cleanly [pid 34405]
+[INFO] [static_transform_publisher-5]: process has finished cleanly [pid 34403]
+[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 34399]
+[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 34395]
+[ERROR] [limo_base-7]: process has died [pid 34427, exit code -6, cmd '/home/limo/development/ros/ros2_ws/install/limo_base/lib/limo_base/limo_base --ros-args --params-file /tmp/launch_params_pcnw5u31'].
+[INFO] [joint_state_publisher-2]: process has finished cleanly [pid 34397]
+[limo_base-7] [INFO] [1771976648.012973032] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[limo_base-7] terminate called without an active exception
+[ydlidar_ros2_driver_node-8] [INFO] [1771976648.022001416] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ydlidar_ros2_driver_node-8] [INFO] [1771976648.052454568] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Now YDLIDAR is stopping .......
+[arm_then_run_wall_follower.py-9] Traceback (most recent call last):
+[arm_then_run_wall_follower.py-9]   File "/home/limo/development/ros/ros2_ws/install/blazerbot_bringup/lib/blazerbot_bringup/arm_then_run_wall_follower.py", line 26, in <module>
+[arm_then_run_wall_follower.py-9]     raise SystemExit(main())
+[arm_then_run_wall_follower.py-9]   File "/home/limo/development/ros/ros2_ws/install/blazerbot_bringup/lib/blazerbot_bringup/arm_then_run_wall_follower.py", line 17, in main
+[arm_then_run_wall_follower.py-9]     input("Press Enter")
+[arm_then_run_wall_follower.py-9] KeyboardInterrupt
+[static_transform_publisher-4] [INFO] [1771976648.012545160] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-6] [INFO] [1771976648.012643592] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-3] [INFO] [1771976648.013841224] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-1] [INFO] [1771976648.018743784] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Now lidar scanning has stopped!
+[arm_then_run_wall_follower.py-9] Press Enter
+[INFO] [ydlidar_ros2_driver_node-8]: process has finished cleanly [pid 34434]
+
+development/ros/ros2_ws took 2m 15.1s …
+➜ cbs                                                                        
+Starting >>> costmap_converter_msgs
+Starting >>> limo_msgs
+Starting >>> mycobot_bringup
+Starting >>> mycobot_description
+Starting >>> mycobot_gazebo
+Starting >>> mycobot_moveit_config
+Finished <<< mycobot_bringup [0.36s]                                            
+Starting >>> mycobot_system_tests
+--- stderr: costmap_converter_msgs                                              
+failed to create symbolic link '/home/limo/development/ros/ros2_ws/build/costmap_converter_msgs/ament_cmake_python/costmap_converter_msgs/costmap_converter_msgs' because existing path cannot be removed: Is a directory
+gmake[2]: *** [CMakeFiles/ament_cmake_python_symlink_costmap_converter_msgs.dir/build.make:70: CMakeFiles/ament_cmake_python_symlink_costmap_converter_msgs] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:421: CMakeFiles/ament_cmake_python_symlink_costmap_converter_msgs.dir/all] Error 2
+gmake[1]: *** Waiting for unfinished jobs....
+gmake: *** [Makefile:146: all] Error 2
+---
+Failed   <<< costmap_converter_msgs [0.44s, exited with code 2]
+Finished <<< mycobot_description [0.44s]
+--- stderr: limo_msgs
+failed to create symbolic link '/home/limo/development/ros/ros2_ws/build/limo_msgs/ament_cmake_python/limo_msgs/limo_msgs' because existing path cannot be removed: Is a directory
+gmake[2]: *** [CMakeFiles/ament_cmake_python_symlink_limo_msgs.dir/build.make:70: CMakeFiles/ament_cmake_python_symlink_limo_msgs] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:421: CMakeFiles/ament_cmake_python_symlink_limo_msgs.dir/all] Error 2
+gmake[1]: *** Waiting for unfinished jobs....
+gmake: *** [Makefile:146: all] Error 2
+---
+Failed   <<< limo_msgs [0.48s, exited with code 2]
+Aborted  <<< mycobot_system_tests [0.11s]                                      
+Aborted  <<< mycobot_gazebo [0.94s]                                            
+Aborted  <<< mycobot_moveit_config [1.18s]                            
+
+Summary: 2 packages finished [1.99s]
+  2 packages failed: costmap_converter_msgs limo_msgs
+  3 packages aborted: mycobot_gazebo mycobot_moveit_config mycobot_system_tests
+  4 packages had stderr output: costmap_converter_msgs limo_msgs mycobot_gazebo mycobot_moveit_config
+  17 packages not processed
+
+development/ros/ros2_ws took 2.6s …
+➜ 
+
+development/ros/ros2_ws …
+➜ 
