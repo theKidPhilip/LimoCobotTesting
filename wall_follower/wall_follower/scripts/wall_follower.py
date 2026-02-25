@@ -1,140 +1,189 @@
 #!/usr/bin/env python3
 """
-wall_follower_node.py
+Wall follower node (AUTO-RUN, no keyboard).
 
-Simple, robust wall follower for LIMO:
-- Uses LaserScan (/scan)
-- Publishes Twist (/cmd_vel)
-- Follows the right wall by default
-- Avoids obstacles in front
+Subscribes:
+  /scan  (sensor_msgs/LaserScan)
 
-No keyboard input. Runs immediately.
-
-Tune:
-- desired_dist
-- kp
-- forward_speed
-- max_ang
+Publishes:
+  /cmd_vel (geometry_msgs/Twist)
 """
 
 import math
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from sensor_msgs.msg import LaserScan
+from geometry_msgs.msg import Twist
 
 
-def _finite_min(values, default=10.0):
-    m = default
-    for v in values:
-        if v is None:
-            continue
-        if math.isfinite(v) and v > 0.0:
-            m = min(m, v)
-    return m
+def _finite(x: float) -> bool:
+    return (not math.isinf(x)) and (not math.isnan(x))
 
 
 class WallFollower(Node):
     def __init__(self):
-        super().__init__("wall_follower_node")
+        super().__init__("wall_follower")
 
-        # ===== Parameters (you can ros2 param set these too) =====
-        self.declare_parameter("follow_side", "right")   # "right" or "left"
-        self.declare_parameter("desired_dist", 0.35)     # meters
-        self.declare_parameter("kp", 1.2)
-        self.declare_parameter("forward_speed", 0.18)    # m/s
-        self.declare_parameter("slow_speed", 0.10)       # m/s
-        self.declare_parameter("max_ang", 0.9)           # rad/s
-        self.declare_parameter("front_stop", 0.40)       # m
-        self.declare_parameter("front_turn", 0.60)       # m
-        self.declare_parameter("sector_deg", 15)         # degrees each side
+        # ---------------- Parameters ----------------
+        self.declare_parameter("side_choice", "none")   # "left" / "right" / "none"
+        self.declare_parameter("algo_choice", "min")    # "min" / "avg"
+        self.declare_parameter("control_hz", 10.0)
 
-        self.follow_side = self.get_parameter("follow_side").value
-        self.desired_dist = float(self.get_parameter("desired_dist").value)
-        self.kp = float(self.get_parameter("kp").value)
-        self.forward_speed = float(self.get_parameter("forward_speed").value)
-        self.slow_speed = float(self.get_parameter("slow_speed").value)
+        self.declare_parameter("robot_radius", 0.10)
+        self.declare_parameter("side_gap_min", 0.05)    # + radius
+        self.declare_parameter("side_gap_max", 0.10)    # + radius
+        self.declare_parameter("front_gap", 0.40)       # + radius
+
+        self.declare_parameter("lin_slow", 0.10)
+        self.declare_parameter("lin_fast", 0.20)        # safer on real robot
+        self.declare_parameter("ang_slow", 0.08)
+        self.declare_parameter("ang_fast", 0.50)
+
+        self.declare_parameter("max_lin", 0.20)
+        self.declare_parameter("max_ang", 0.80)
+
+        self.declare_parameter("front_window_deg", 15.0)
+        self.declare_parameter("side_window_deg", 15.0)
+
+        # ---------------- Load params ----------------
+        self.side_choice = str(self.get_parameter("side_choice").value).lower()
+        self.algo_choice = str(self.get_parameter("algo_choice").value).lower()
+
+        rr = float(self.get_parameter("robot_radius").value)
+        self.side_threshold_min = rr + float(self.get_parameter("side_gap_min").value)
+        self.side_threshold_max = rr + float(self.get_parameter("side_gap_max").value)
+        self.front_threshold = rr + float(self.get_parameter("front_gap").value)
+
+        self.lin_slow = float(self.get_parameter("lin_slow").value)
+        self.lin_fast = float(self.get_parameter("lin_fast").value)
+        self.ang_slow = float(self.get_parameter("ang_slow").value)
+        self.ang_fast = float(self.get_parameter("ang_fast").value)
+
+        self.max_lin = float(self.get_parameter("max_lin").value)
         self.max_ang = float(self.get_parameter("max_ang").value)
-        self.front_stop = float(self.get_parameter("front_stop").value)
-        self.front_turn = float(self.get_parameter("front_turn").value)
-        self.sector_deg = int(self.get_parameter("sector_deg").value)
+
+        self.front_window_deg = float(self.get_parameter("front_window_deg").value)
+        self.side_window_deg = float(self.get_parameter("side_window_deg").value)
+
+        # Angular multiplier based on algo (matches your old logic idea)
+        self.ang_vel_mult = 1.25 if self.algo_choice == "min" else 3.0
+
+        # ---------------- ROS interfaces ----------------
+        qos = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10,
+            durability=DurabilityPolicy.VOLATILE,
+        )
 
         self.cmd_pub = self.create_publisher(Twist, "/cmd_vel", 10)
-        self.scan_sub = self.create_subscription(LaserScan, "/scan", self.scan_cb, 10)
+        self.scan_sub = self.create_subscription(LaserScan, "/scan", self.scan_cb, qos)
 
-        self.last_scan = None
-        self.timer = self.create_timer(0.05, self.control_loop)  # 20 Hz
+        # ---------------- State ----------------
+        self.have_scan = False
+        self.wall_found = False
+        self.side_chosen = "none"
 
-        self.get_logger().info("Wall follower running (auto).")
-        self.get_logger().info(f"Follow side: {self.follow_side}, desired_dist: {self.desired_dist}m")
+        self.scan_left = 10.0
+        self.scan_front = 10.0
+        self.scan_right = 10.0
+
+        self.twist = Twist()
+
+        hz = float(self.get_parameter("control_hz").value)
+        self.timer = self.create_timer(1.0 / max(hz, 1.0), self.control_loop)
+
+        self.get_logger().info("WallFollower started (AUTO-RUN).")
+        self.get_logger().info(f"side_choice={self.side_choice}, algo_choice={self.algo_choice}")
 
     def scan_cb(self, msg: LaserScan):
-        self.last_scan = msg
+        def angle_to_index(angle_rad: float) -> int:
+            if msg.angle_increment == 0.0:
+                return 0
+            i = int(round((angle_rad - msg.angle_min) / msg.angle_increment))
+            return max(0, min(i, len(msg.ranges) - 1))
 
-    def get_sector_min(self, scan: LaserScan, center_deg: float, half_width_deg: float) -> float:
-        # Convert degrees to index window around center
-        # scan angles are in radians
-        center = math.radians(center_deg)
-        half = math.radians(half_width_deg)
+        def window_value(center_rad: float, half_window_deg: float, mode: str) -> float:
+            half = math.radians(half_window_deg)
+            i0 = angle_to_index(center_rad - half)
+            i1 = angle_to_index(center_rad + half)
+            if i1 < i0:
+                i0, i1 = i1, i0
 
-        angle_min = scan.angle_min
-        angle_inc = scan.angle_increment
-        n = len(scan.ranges)
+            vals = [msg.ranges[i] for i in range(i0, i1 + 1) if _finite(msg.ranges[i])]
+            if not vals:
+                # if nothing finite, return something "far"
+                return msg.range_max if _finite(msg.range_max) else 10.0
 
-        def idx_from_angle(a):
-            i = int((a - angle_min) / angle_inc)
-            return max(0, min(n - 1, i))
+            return (sum(vals) / len(vals)) if mode == "avg" else min(vals)
 
-        i0 = idx_from_angle(center - half)
-        i1 = idx_from_angle(center + half)
-        if i1 < i0:
-            i0, i1 = i1, i0
+        mode = "avg" if self.algo_choice == "avg" else "min"
 
-        return _finite_min(scan.ranges[i0:i1 + 1], default=scan.range_max)
+        self.scan_front = window_value(0.0, self.front_window_deg, mode)
+        self.scan_right = window_value(-math.pi / 2.0, self.side_window_deg, mode)
+        self.scan_left = window_value(+math.pi / 2.0, self.side_window_deg, mode)
+
+        self.have_scan = True
 
     def control_loop(self):
-        if self.last_scan is None:
+        if not self.have_scan:
             return
 
-        scan = self.last_scan
-        half = float(self.sector_deg)
+        lin = 0.0
+        ang = 0.0
 
-        # Front is 0 deg
-        front = self.get_sector_min(scan, 0.0, half)
+        if not self.wall_found:
+            # move forward until we detect a wall in front
+            if self.scan_front < self.front_threshold:
+                self.wall_found = True
 
-        # Right is -90 deg, Left is +90 deg (ROS standard)
-        right = self.get_sector_min(scan, -90.0, half)
-        left = self.get_sector_min(scan, 90.0, half)
+                # choose side
+                if self.side_choice in ("left", "right"):
+                    self.side_chosen = self.side_choice
+                else:
+                    self.side_chosen = "right" if (self.scan_right < self.scan_left) else "left"
 
-        # Choose wall distance measurement based on follow_side
-        if self.follow_side.lower() == "left":
-            wall_dist = left
-            sign = -1.0  # steering direction flips
+                self.get_logger().info(f"Wall found. Following on: {self.side_chosen}")
+                lin = 0.0
+                ang = 0.0
+            else:
+                lin = self.lin_slow
+                ang = 0.0
+
         else:
-            wall_dist = right
-            sign = +1.0
+            # obstacle/wall in front -> turn away while creeping forward
+            if self.scan_front < self.front_threshold:
+                lin = self.lin_slow
+                if self.side_chosen == "right":
+                    ang = +self.ang_fast * self.ang_vel_mult  # turn left
+                else:
+                    ang = -self.ang_fast * self.ang_vel_mult  # turn right
+            else:
+                # follow wall by keeping distance in a band
+                lin = self.lin_fast
+                if self.side_chosen == "right":
+                    if self.scan_right < self.side_threshold_min:
+                        ang = +self.ang_slow
+                    elif self.scan_right > self.side_threshold_max:
+                        ang = -self.ang_slow
+                    else:
+                        ang = 0.0
+                else:
+                    if self.scan_left < self.side_threshold_min:
+                        ang = -self.ang_slow
+                    elif self.scan_left > self.side_threshold_max:
+                        ang = +self.ang_slow
+                    else:
+                        ang = 0.0
 
-        # Error: positive means too far from wall (need to steer toward wall)
-        error = self.desired_dist - wall_dist
+        # clamp
+        lin = max(-self.max_lin, min(self.max_lin, lin))
+        ang = max(-self.max_ang, min(self.max_ang, ang))
 
-        twist = Twist()
-
-        # Obstacle handling
-        if front < self.front_stop:
-            twist.linear.x = 0.0
-            # Turn away from obstacle: if following right wall, turn left (+z)
-            twist.angular.z = sign * (+self.max_ang)
-        elif front < self.front_turn:
-            twist.linear.x = self.slow_speed
-            twist.angular.z = sign * (+0.6 * self.max_ang)
-        else:
-            twist.linear.x = self.forward_speed
-            twist.angular.z = sign * (self.kp * error)
-
-        # Clamp angular
-        twist.angular.z = max(-self.max_ang, min(self.max_ang, twist.angular.z))
-
-        self.cmd_pub.publish(twist)
+        self.twist.linear.x = float(lin)
+        self.twist.angular.z = float(ang)
+        self.cmd_pub.publish(self.twist)
 
 
 def main(args=None):
@@ -145,7 +194,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        # stop robot on exit
+        # stop on exit
         stop = Twist()
         node.cmd_pub.publish(stop)
         node.destroy_node()
