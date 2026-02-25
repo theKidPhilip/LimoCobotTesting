@@ -7,6 +7,7 @@ from rclpy.qos import (HistoryPolicy, ReliabilityPolicy,
                        DurabilityPolicy, LivelinessPolicy)
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import ReentrantCallbackGroup
+
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
@@ -19,30 +20,70 @@ import termios
 import threading
 
 
-# Global Settings
+# ---------------- GLOBAL SETTINGS ----------------
+
 side_choice = "none"   # "left" or "right" or "none"
 algo_choice = "min"    # "min" or "avg"
 
+
+# ---------------- WALL FOLLOWER CLASS ----------------
 
 class WallFollower(Node):
 
     def __init__(self):
         super().__init__('wall_follower')
+
         self.get_logger().info("Initializing Wall Follower ...")
 
-        # Angular multiplier
+        # ---------------- Parameters ----------------
+
+        self.robot_radius = 0.10
+        self.side_threshold_min = self.robot_radius + 0.05
+        self.side_threshold_max = self.robot_radius + 0.10
+        self.front_threshold = self.robot_radius + 0.40
+
+        self.lin_vel_zero = 0.0
+        self.lin_vel_slow = 0.10
+        self.lin_vel_fast = 0.25
+
+        self.ang_vel_zero = 0.0
+        self.ang_vel_slow = 0.05
+        self.ang_vel_fast = 0.50
+
         if algo_choice == "min":
-            self.ang_vel_mult = 1.250
+            self.ang_vel_mult = 1.25
         else:
-            self.ang_vel_mult = 3.000
+            self.ang_vel_mult = 3.0
 
-        # Publisher
-        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
+        # ---------------- State ----------------
 
-        self.callback_group = ReentrantCallbackGroup()
+        self.wall_found = False
+        self.side_chosen = "none"
 
-        # QoS
-        self.scan_sub_qos = QoSProfile(
+        self.scan_info_done = False
+        self.scan_data_ready = False
+
+        self.scan_ranges_size = 0
+        self.scan_right_range = float('inf')
+        self.scan_left_range = float('inf')
+        self.scan_front_range = float('inf')
+
+        self.iterations_count = 0
+        self.ignore_iterations = 5
+
+        self.twist_cmd = Twist()
+
+        # ---------------- Publisher ----------------
+
+        self.cmd_vel_pub = self.create_publisher(
+            Twist,
+            "/cmd_vel",
+            10
+        )
+
+        # ---------------- QoS ----------------
+
+        qos = QoSProfile(
             depth=10,
             history=HistoryPolicy.KEEP_LAST,
             reliability=ReliabilityPolicy.BEST_EFFORT,
@@ -50,12 +91,15 @@ class WallFollower(Node):
             liveliness=LivelinessPolicy.AUTOMATIC
         )
 
-        # Subscribers
+        self.callback_group = ReentrantCallbackGroup()
+
+        # ---------------- Subscribers ----------------
+
         self.scan_sub = self.create_subscription(
             LaserScan,
             "/scan",
             self.scan_callback,
-            self.scan_sub_qos,
+            qos,
             callback_group=self.callback_group
         )
 
@@ -63,18 +107,20 @@ class WallFollower(Node):
             Odometry,
             "/odom",
             self.odom_callback,
-            self.scan_sub_qos,
+            qos,
             callback_group=self.callback_group
         )
 
-        # Timer
+        # ---------------- Timer ----------------
+
         self.control_timer = self.create_timer(
             0.2,
             self.control_callback,
             callback_group=self.callback_group
         )
 
-        # Keyboard
+        # ---------------- Keyboard ----------------
+
         self.enabled = False
         self.key_thread = threading.Thread(
             target=self.keyboard_listener,
@@ -82,137 +128,94 @@ class WallFollower(Node):
         )
         self.key_thread.start()
 
-        # Motion values
-        self.lin_vel_zero = 0.0
-        self.lin_vel_slow = 0.1
-        self.lin_vel_fast = 0.25
-        self.ang_vel_zero = 0.0
-        self.ang_vel_slow = 0.05
-        self.ang_vel_fast = 0.5
-
-        # Robot parameters
-        self.robot_radius = 0.10
-        self.side_threshold_min = self.robot_radius + 0.05
-        self.side_threshold_max = self.robot_radius + 0.10
-        self.front_threshold = self.robot_radius + 0.40
-
-        # State variables
-        self.wall_found = False
-        self.side_chosen = "none"
-
-        # Scan variables
-        self.scan_info_done = False
-        self.scan_data_ready = False
-        self.scan_right_range = float('inf')
-        self.scan_front_range = float('inf')
-        self.scan_left_range = float('inf')
-
-        self.scan_ranges_size = 0
-
-        # Odom variables
-        self.odom_info_done = False
-        self.odom_distance = 0.0
-        self.odom_prev_x = 0.0
-        self.odom_prev_y = 0.0
-        self.odom_curr_x = 0.0
-        self.odom_curr_y = 0.0
-
-        self.twist_cmd = Twist()
-
+        self.get_logger().info("Press 's' to toggle wall following, 'q' to quit.")
         self.get_logger().info("Wall Follower Initialized!")
 
-    # ---------------- KEYBOARD ----------------
+    # -------------------------------------------------
+    # ---------------- KEYBOARD -----------------------
+    # -------------------------------------------------
 
     def keyboard_listener(self):
         old_settings = termios.tcgetattr(sys.stdin)
         tty.setcbreak(sys.stdin.fileno())
+
         try:
             while rclpy.ok():
                 if select.select([sys.stdin], [], [], 0.1)[0]:
                     key = sys.stdin.read(1)
+
                     if key == 's':
                         self.enabled = not self.enabled
                         self.get_logger().info(
-                            f"Wall following {'ENABLED' if self.enabled else 'DISABLED'}"
+                            f"Wall Following {'ENABLED' if self.enabled else 'DISABLED'}"
                         )
                         if not self.enabled:
                             self.stop_robot()
+
                     elif key == 'q':
                         rclpy.shutdown()
                         break
         finally:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
-    # ---------------- SCAN CALLBACK ----------------
+    # -------------------------------------------------
+    # ---------------- SCAN CALLBACK ------------------
+    # -------------------------------------------------
 
-    def scan_callback(self, msg):
+    def scan_callback(self, scan_msg):
 
         if not self.scan_info_done:
-            self.scan_ranges_size = len(msg.ranges)
+            self.scan_ranges_size = len(scan_msg.ranges)
             self.scan_info_done = True
             return
 
         if self.scan_ranges_size == 0:
             return
 
+        center = int(self.scan_ranges_size / 2)
+
+        right_index = center - 90
+        left_index = center + 90
+        front_index = center
+
         right_min = float('inf')
-        front_min = float('inf')
         left_min = float('inf')
+        front_min = float('inf')
 
-        center = self.scan_ranges_size // 2
-        side_span = int(15)
-        front_span = int(15)
-
-        for i, distance in enumerate(msg.ranges):
+        for i, distance in enumerate(scan_msg.ranges):
 
             if math.isinf(distance):
                 continue
 
-            # Right
-            if center - 90 - side_span <= i <= center - 90 + side_span:
+            if right_index - 5 <= i <= right_index + 5:
                 if distance < right_min:
                     right_min = distance
 
-            # Front
-            if center - front_span <= i <= center + front_span:
-                if distance < front_min:
-                    front_min = distance
-
-            # Left
-            if center + 90 - side_span <= i <= center + 90 + side_span:
+            if left_index - 5 <= i <= left_index + 5:
                 if distance < left_min:
                     left_min = distance
 
+            if front_index - 5 <= i <= front_index + 5:
+                if distance < front_min:
+                    front_min = distance
+
+        # 🔥 Correct assignment (fixed bug)
         self.scan_right_range = right_min
-        self.scan_front_range = front_min
         self.scan_left_range = left_min
+        self.scan_front_range = front_min
 
         self.scan_data_ready = True
 
-    # ---------------- ODOM CALLBACK ----------------
+    # -------------------------------------------------
+    # ---------------- ODOM CALLBACK ------------------
+    # -------------------------------------------------
 
     def odom_callback(self, msg):
+        pass
 
-        x = msg.pose.pose.position.x
-        y = msg.pose.pose.position.y
-
-        if not self.odom_info_done:
-            self.odom_prev_x = x
-            self.odom_prev_y = y
-            self.odom_info_done = True
-            return
-
-        dx = x - self.odom_prev_x
-        dy = y - self.odom_prev_y
-        self.odom_distance += math.sqrt(dx*dx + dy*dy)
-
-        self.odom_prev_x = x
-        self.odom_prev_y = y
-
-        self.odom_curr_x = x
-        self.odom_curr_y = y
-
-    # ---------------- CONTROL ----------------
+    # -------------------------------------------------
+    # ---------------- CONTROL ------------------------
+    # -------------------------------------------------
 
     def control_callback(self):
 
@@ -221,6 +224,13 @@ class WallFollower(Node):
 
         if not self.scan_info_done or not self.scan_data_ready:
             return
+
+        if self.iterations_count < self.ignore_iterations:
+            self.iterations_count += 1
+            self.stop_robot()
+            return
+
+        # -------- FIND WALL --------
 
         if not self.wall_found:
 
@@ -237,56 +247,66 @@ class WallFollower(Node):
                 else:
                     self.side_chosen = side_choice
 
-                self.get_logger().info(f"Wall found. Following {self.side_chosen} side.")
+                self.get_logger().info(f"Wall Found. Following {self.side_chosen}")
+
             else:
                 self.twist_cmd.linear.x = self.lin_vel_slow
                 self.twist_cmd.angular.z = 0.0
 
+        # -------- FOLLOW WALL --------
+
         else:
 
             if self.scan_front_range < self.front_threshold:
+
                 self.twist_cmd.linear.x = self.lin_vel_slow
+
                 if self.side_chosen == "right":
-                    self.twist_cmd.angular.z = self.ang_vel_fast
+                    self.twist_cmd.angular.z = self.ang_vel_fast * self.ang_vel_mult
                 else:
-                    self.twist_cmd.angular.z = -self.ang_vel_fast
+                    self.twist_cmd.angular.z = -self.ang_vel_fast * self.ang_vel_mult
+
             else:
+
                 self.twist_cmd.linear.x = self.lin_vel_fast
 
                 if self.side_chosen == "right":
+
                     if self.scan_right_range < self.side_threshold_min:
                         self.twist_cmd.angular.z = self.ang_vel_slow
+
                     elif self.scan_right_range > self.side_threshold_max:
                         self.twist_cmd.angular.z = -self.ang_vel_slow
+
                     else:
                         self.twist_cmd.angular.z = 0.0
 
-                if self.side_chosen == "left":
+                elif self.side_chosen == "left":
+
                     if self.scan_left_range < self.side_threshold_min:
                         self.twist_cmd.angular.z = -self.ang_vel_slow
+
                     elif self.scan_left_range > self.side_threshold_max:
                         self.twist_cmd.angular.z = self.ang_vel_slow
+
                     else:
                         self.twist_cmd.angular.z = 0.0
 
         self.publish_twist_cmd()
 
-    # ---------------- UTILITIES ----------------
-
-    def stop_robot(self):
-        self.twist_cmd.linear.x = 0.0
-        self.twist_cmd.angular.z = 0.0
-        self.publish_twist_cmd()
+    # -------------------------------------------------
+    # ---------------- UTILITIES ----------------------
+    # -------------------------------------------------
 
     def publish_twist_cmd(self):
 
-        # Limit linear velocity
+        # Linear clamp
         if self.twist_cmd.linear.x > 0.15:
             self.twist_cmd.linear.x = 0.15
         if self.twist_cmd.linear.x < -0.15:
             self.twist_cmd.linear.x = -0.15
 
-        # Limit angular velocity (both directions)
+        # Angular clamp (fixed both directions)
         if self.twist_cmd.angular.z > 0.45:
             self.twist_cmd.angular.z = 0.45
         if self.twist_cmd.angular.z < -0.45:
@@ -294,12 +314,20 @@ class WallFollower(Node):
 
         self.cmd_vel_pub.publish(self.twist_cmd)
 
+    def stop_robot(self):
+        self.twist_cmd.linear.x = 0.0
+        self.twist_cmd.angular.z = 0.0
+        self.cmd_vel_pub.publish(self.twist_cmd)
 
-# ---------------- MAIN ----------------
+
+# -------------------------------------------------
+# ---------------- MAIN ---------------------------
+# -------------------------------------------------
 
 def main(args=None):
     rclpy.init(args=args)
     node = WallFollower()
+
     executor = MultiThreadedExecutor(num_threads=4)
     executor.add_node(node)
 
