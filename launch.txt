@@ -1,0 +1,22 @@
+limo_ros2 on  testing [!?] …
+➜ ros2 topic info /cmd_vel               
+Type: geometry_msgs/msg/Twist
+Publisher count: 0
+Subscription count: 1
+
+limo_ros2 on  testing [!?] …
+➜ ros2 topic echo /limo_status --once                  
+header:
+  stamp:
+    sec: 1
+    nanosec: 771978632
+  frame_id: ''
+vehicle_state: 0
+control_mode: 1
+battery_voltage: 12.4
+error_code: 0
+motion_mode: 1
+---
+
+limo_ros2 took 3.0s …
+➜ 
