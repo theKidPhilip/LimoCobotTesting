@@ -23,6 +23,7 @@ def generate_launch_description():
         executable="arm_then_run_wall_follower",
         name="arm_then_run_wall_follower",
         output="screen",
+        emulate_tty=True,  # needed to read keyboard input when launched via ros2 launch
     )
 
     return LaunchDescription([limo_start, arm_and_run])
