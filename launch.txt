@@ -1,22 +1,17 @@
-limo_ros2 on  testing [!?] …
-➜ ros2 topic info /cmd_vel               
-Type: geometry_msgs/msg/Twist
-Publisher count: 0
-Subscription count: 1
+Build + test commands (exact)
+cd ~/development/ros/ros2_ws
+colcon build --packages-select wall_follower blazerbot_bringup --symlink-install
+source install/setup.zsh
 
-limo_ros2 on  testing [!?] …
-➜ ros2 topic echo /limo_status --once                  
-header:
-  stamp:
-    sec: 1
-    nanosec: 771978632
-  frame_id: ''
-vehicle_state: 0
-control_mode: 1
-battery_voltage: 12.4
-error_code: 0
-motion_mode: 1
----
+# Verify executables exist
+ros2 pkg executables wall_follower | grep wall_follower_node
+ros2 pkg executables blazerbot_bringup | grep arm_then_run_wall_follower
 
-limo_ros2 took 3.0s …
-➜ 
+# Run bringup
+ros2 launch blazerbot_bringup robot_bringup.launch.py
+
+Press S → wall follower starts.
+
+Quick “did it start?” checks (use another terminal)
+ros2 node list | grep wall_follower
+ros2 topic echo /cmd_vel --once
