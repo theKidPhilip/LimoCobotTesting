@@ -1,705 +1,89 @@
+1) Launch LiDAR only (no base)
 
-development/ros/ros2_ws …
-➜ ros2 launch blazerbot_bringup robot_bringup.launch.py                      
-[INFO] [launch]: All log files can be found below /home/limo/.ros/log/2026-02-25-00-57-30-382581-ashlimo01-166229
-[INFO] [launch]: Default logging verbosity is set to INFO
-[INFO] [limo_base-7]: process started with pid [166290]
-[INFO] [ydlidar_ros2_driver_node-8]: process started with pid [166305]
-[INFO] [robot_state_publisher-1]: process started with pid [166277]
-[INFO] [joint_state_publisher-2]: process started with pid [166279]
-[INFO] [static_transform_publisher-3]: process started with pid [166281]
-[INFO] [static_transform_publisher-4]: process started with pid [166283]
-[INFO] [static_transform_publisher-5]: process started with pid [166285]
-[INFO] [static_transform_publisher-6]: process started with pid [166287]
-[INFO] [arm_then_run_wall_follower.py-9]: process started with pid [166316]
-[static_transform_publisher-3] [WARN] [1771981051.090182664] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-4] [WARN] [1771981051.094424680] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-5] [WARN] [1771981051.103098440] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-6] [WARN] [1771981051.130803784] []: Old-style arguments are deprecated; see --help for new-style arguments
-[arm_then_run_wall_follower.py-9] 
-[arm_then_run_wall_follower.py-9] [blazerbot_bringup] LIMO is up.
-[arm_then_run_wall_follower.py-9] [blazerbot_bringup] Press 'S' to START wall following.
-[arm_then_run_wall_follower.py-9] [blazerbot_bringup] Press 'Q' to quit.
-[arm_then_run_wall_follower.py-9] 
-[static_transform_publisher-4] [INFO] [1771981051.639476008] [base_link_to_laser_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-4] translation: ('0.180000', '0.000000', '0.000000')
-[static_transform_publisher-4] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-4] from 'base_link' to 'laser_link'
-[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
-[ydlidar_ros2_driver_node-8] [INFO] [1771981051.942993736] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Current ROS Driver Version: 1.0.1
-[ydlidar_ros2_driver_node-8] 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK initializing
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK has been initialized
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK Version: 1.2.7
-[static_transform_publisher-3] [INFO] [1771981051.956619464] [base_footprint_to_base_link_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.150000')
-[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-3] from 'base_footprint' to 'base_link'
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] [INFO] [1771981051.963691752] [robot_state_publisher]: got segment base_footprint
-[robot_state_publisher-1] [INFO] [1771981051.963955112] [robot_state_publisher]: got segment base_link
-[robot_state_publisher-1] [INFO] [1771981051.963981672] [robot_state_publisher]: got segment depth_camera_link
-[robot_state_publisher-1] [INFO] [1771981051.963994280] [robot_state_publisher]: got segment depth_link
-[robot_state_publisher-1] [INFO] [1771981052.016438760] [robot_state_publisher]: got segment front_left_wheel_link
-[robot_state_publisher-1] [INFO] [1771981052.019410920] [robot_state_publisher]: got segment front_right_wheel_link
-[robot_state_publisher-1] [INFO] [1771981052.019459848] [robot_state_publisher]: got segment imu_link
-[robot_state_publisher-1] [INFO] [1771981052.019480264] [robot_state_publisher]: got segment inertial_link
-[robot_state_publisher-1] [INFO] [1771981052.020703112] [robot_state_publisher]: got segment laser_link
-[robot_state_publisher-1] [INFO] [1771981052.020737512] [robot_state_publisher]: got segment left_steering_hinge
-[robot_state_publisher-1] [INFO] [1771981052.020754984] [robot_state_publisher]: got segment rear_left_wheel_link
-[robot_state_publisher-1] [INFO] [1771981052.020950664] [robot_state_publisher]: got segment rear_right_wheel_link
-[robot_state_publisher-1] [INFO] [1771981052.020972488] [robot_state_publisher]: got segment right_steering_hinge
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar successfully connected [/dev/ttyUSB0:230400]
-[static_transform_publisher-6] [INFO] [1771981052.309539368] [base_link_to_imu_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-6] translation: ('0.000000', '0.000000', '0.000000')
-[static_transform_publisher-6] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-6] from 'base_link' to 'imu_link'
-[limo_base-7] Loading parameters: 
-[static_transform_publisher-5] [INFO] [1771981052.444840808] [base_link_to_camera_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-5] translation: ('0.180000', '0.000000', '0.180000')
-[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-5] from 'base_link' to 'camera_link'
-[limo_base-7] - port name: ttyTHS1
-[limo_base-7] - odom frame name: odom
-[limo_base-7] - base frame name: base_link
-[limo_base-7] - odom topic name: 1
-[limo_base-7] - use_mcnamu_: 0
-[limo_base-7] [INFO] [1771981052.777697288] [limo_base]: connet the serial port:'/dev/ttyTHS1'
-[limo_base-7] [INFO] [1771981052.778280008] [limo_base]: enableCommandedMode :
-[limo_base-7] [INFO] [1771981052.778337576] [limo_base]: Open the serial port:'/dev/ttyTHS1'
-[limo_base-7] [ERROR] [1771981052.870839336] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981052.980523848] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981052.995595528] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.010963112] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.030979432] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.060878760] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.080614248] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.095589512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.120660264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.131238056] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.160690792] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.180380968] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.195371816] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.230434472] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.248518760] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.260797096] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.280670024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.297481992] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.320525800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.345523176] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.361153256] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.380901928] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.395915496] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.421374664] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.432062440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.471813288] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.491490376] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.521437224] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.545750920] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.570883656] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.591121128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.595748328] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.598013608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.621553160] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.641180872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.647859208] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.660874472] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.672011496] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.695878536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.733165480] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.748357224] [limo_base]: Invalid frame! Check sum failed! 
-[arm_then_run_wall_follower.py-9] Traceback (most recent call last):
-[arm_then_run_wall_follower.py-9]   File "/home/limo/development/ros/ros2_ws/install/blazerbot_bringup/lib/blazerbot_bringup/arm_then_run_wall_follower.py", line 48, in <module>
-[arm_then_run_wall_follower.py-9]     raise SystemExit(main())
-[arm_then_run_wall_follower.py-9]   File "/home/limo/development/ros/ros2_ws/install/blazerbot_bringup/lib/blazerbot_bringup/arm_then_run_wall_follower.py", line 33, in main
-[arm_then_run_wall_follower.py-9]     k = get_key()
-[arm_then_run_wall_follower.py-9]   File "/home/limo/development/ros/ros2_ws/install/blazerbot_bringup/lib/blazerbot_bringup/arm_then_run_wall_follower.py", line 18, in get_key
-[arm_then_run_wall_follower.py-9]     old = termios.tcgetattr(fd)
-[arm_then_run_wall_follower.py-9] termios.error: (25, 'Inappropriate ioctl for device')
-[limo_base-7] [ERROR] [1771981053.772114024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.798153896] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.821527720] [limo_base]: Invalid frame! Check sum failed! 
-[ERROR] [arm_then_run_wall_follower.py-9]: process has died [pid 166316, exit code 1, cmd '/home/limo/development/ros/ros2_ws/install/blazerbot_bringup/lib/blazerbot_bringup/arm_then_run_wall_follower.py --ros-args -r __node:=arm_then_run_wall_follower'].
-[limo_base-7] [ERROR] [1771981053.851357288] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.871824392] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.921830056] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.941710216] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.972694568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981053.992045928] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.031552200] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.047233480] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.061739976] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.099276264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.132638984] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.152479464] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.172765352] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.201981320] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.212519368] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.296391368] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.351499912] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.373053608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.431593160] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.448621576] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.472884520] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.496934152] [limo_base]: Invalid frame! Check sum failed! 
-[joint_state_publisher-2] [INFO] [1771981054.512025608] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
-[limo_base-7] [ERROR] [1771981054.531707816] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.541660552] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.562379016] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.597003720] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar running correctly! The health status: good
-[limo_base-7] [ERROR] [1771981054.762326632] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.892600008] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.913312648] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.933242376] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.952413384] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.972473032] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981054.983392136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.202255432] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.234330312] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.372526760] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.397664712] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.462802696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.482600488] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.493376680] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.523362856] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.550874184] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.582765768] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.623032744] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.643113960] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.698242856] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.774103400] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.794109800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.813640008] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Fail to get baseplate device information
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 3886 ms
-[limo_base-7] [ERROR] [1771981055.853920584] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.913107272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.934214024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.963722568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981055.974229512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.014709544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.043760296] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.093950984] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.113928008] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.143573384] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.201270664] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.299452200] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.314228456] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.335292712] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.401545800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.449553320] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.454838696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.493568136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.500562056] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.551641544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.599698632] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.653661288] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.664137192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.683729608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.924851144] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.949084136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.974894504] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981056.994821736] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.024112744] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.044457416] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.051485544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.056059368] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.094588008] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.114977128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.134195560] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.149194952] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.184292104] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.245262536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.301328136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.334442952] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.354640584] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Start to getting intensity flag
-[limo_base-7] [ERROR] [1771981057.449540488] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.464603688] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.476527144] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.500547976] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.565039176] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.654614120] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.705081896] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.754841992] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.805452616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981057.885591240] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] End to getting intensity flag
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0x7D1AD8E0
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:37][error] Check Sum 0xE7EE != 0x6A78
-[limo_base-7] [ERROR] [1771981057.915695400] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:37][error] Check Sum 0x97AD != 0x10D4
-[limo_base-7] [ERROR] [1771981058.026004712] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xE8FB != 0xE19F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xDE8F != 0x632C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xA402 != 0x6410
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x333E != 0xCF42
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x372E != 0x5119
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x8D36 != 0x59B7
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x9607 != 0x1585
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xA35D != 0x5378
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x2B8F != 0x681B
-[limo_base-7] [ERROR] [1771981058.201251368] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x381A != 0x8463
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x330D != 0x17F9
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x8613 != 0xCE36
-[limo_base-7] [ERROR] [1771981058.355754568] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2574 ms
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x9648 != 0x1656
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xA7C3 != 0xC0CA
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x2555 != 0x681E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x4CC4 != 0x974F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xB12E != 0x379B
-[limo_base-7] [ERROR] [1771981058.516694568] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xCB96 != 0x8648
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xE0F1 != 0x6FDD
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x7BEC != 0x8B47
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x95CB != 0x7D54
-[limo_base-7] [ERROR] [1771981058.616822056] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xF260 != 0xC075
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xC2E3 != 0xEEDC
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xA16A != 0xE79D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x5CE1 != 0xB990
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xD4DC != 0xF077
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x8C10 != 0x6299
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x6E37 != 0x4DB2
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x36DC != 0x6DE0
-[limo_base-7] [ERROR] [1771981058.696912456] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x9C20 != 0x7000
-[limo_base-7] [ERROR] [1771981058.746151528] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x01C7 != 0x2D58
-[limo_base-7] [ERROR] [1771981058.816268968] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x01F4 != 0x6168
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x7B9F != 0xFD1B
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x2837 != 0xD628
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xDDBD != 0x1622
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0xD53C != 0x62BF
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:38][error] Check Sum 0x94B8 != 0x6CC6
-[limo_base-7] [ERROR] [1771981058.900890472] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981058.956322952] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981059.016950344] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x2C75 != 0x49DA
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xA9C9 != 0x9D6E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x6E4B != 0x96F0
-[limo_base-7] [ERROR] [1771981059.066428968] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xAED0 != 0x4C1D
-[limo_base-7] [ERROR] [1771981059.106777352] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x401A != 0x7D19
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xA17C != 0x178C
-[limo_base-7] [ERROR] [1771981059.146135016] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xC2DE != 0x158D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x9416 != 0x1407
-[limo_base-7] [ERROR] [1771981059.196573832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981059.216266600] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x8905 != 0x771A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xE7DC != 0x9A92
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x7487 != 0x2DA7
-[limo_base-7] [ERROR] [1771981059.237434536] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xA4BB != 0xF3FB
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x31A4 != 0xDEEA
-[limo_base-7] [ERROR] [1771981059.255515432] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x5EE2 != 0x6D45
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xDCB8 != 0x92D9
-[limo_base-7] [ERROR] [1771981059.326364104] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981059.351573288] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x57DC != 0xEDC6
-[limo_base-7] [ERROR] [1771981059.386768136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981059.426793032] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x2E38 != 0xDB77
-[limo_base-7] [ERROR] [1771981059.446893064] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x5359 != 0xA7BE
-[limo_base-7] [ERROR] [1771981059.467318408] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x3A34 != 0x6CBF
-[limo_base-7] [ERROR] [1771981059.517679592] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x8838 != 0xECCB
-[limo_base-7] [ERROR] [1771981059.546926248] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xC659 != 0x48F8
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x6FBF != 0x6FFD
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x69B9 != 0x7BF9
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x5BDC != 0x18C2
-[limo_base-7] [ERROR] [1771981059.737502216] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xE5F4 != 0x7B23
-[limo_base-7] [ERROR] [1771981059.752725768] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x9A39 != 0x6F40
-[limo_base-7] [ERROR] [1771981059.837222952] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x088C != 0x12B7
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xF390 != 0x6CDC
-[limo_base-7] [ERROR] [1771981059.907239880] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0x1876 != 0x2D3A
-[limo_base-7] [ERROR] [1771981059.947346728] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981059.957649256] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981059.978962024] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:39][error] Check Sum 0xC085 != 0x68F6
-[limo_base-7] [ERROR] [1771981060.016931624] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981060.027537448] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x28EC != 0x440D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x3320 != 0x176C
-[limo_base-7] [ERROR] [1771981060.117406888] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xAF70 != 0x974A
-[limo_base-7] [ERROR] [1771981060.157091304] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x73B1 != 0x1372
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xDB11 != 0x7A9F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x2950 != 0x6FF3
-[limo_base-7] [ERROR] [1771981060.187772744] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x3906 != 0x934C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x4365 != 0x94BB
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x0408 != 0x4BEB
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x794F != 0x13F8
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xB339 != 0x07A5
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x1A6C != 0x6EFD
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x9BEC != 0x96D3
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xB158 != 0x1729
-[limo_base-7] [ERROR] [1771981060.327335688] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x48AA != 0xC451
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x4B83 != 0x69EA
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x30B7 != 0x6F50
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xE899 != 0x92FE
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x0075 != 0x2D21
-[limo_base-7] [ERROR] [1771981060.438587560] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xE4DF != 0x88D6
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xFE3C != 0x7A47
-[limo_base-7] [ERROR] [1771981060.478273480] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xDF17 != 0x6F12
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x47FF != 0x4A03
-[limo_base-7] [ERROR] [1771981060.504540200] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x69AD != 0x6A2F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x849A != 0x93EE
-[limo_base-7] [ERROR] [1771981060.527825480] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x351B != 0xBDC6
-[limo_base-7] [ERROR] [1771981060.537848264] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x2FAF != 0xF8A8
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xBB3C != 0x4444
-[limo_base-7] [ERROR] [1771981060.557900936] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xAFE6 != 0x68E8
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xE9AD != 0xF3F0
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x1666 != 0x493B
-[limo_base-7] [ERROR] [1771981060.618489512] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x05DB != 0x7816
-[limo_base-7] [ERROR] [1771981060.628533864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981060.652714056] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xEA5B != 0x6E53
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x7AD9 != 0xB195
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xBF7A != 0x7A4C
-[limo_base-7] [ERROR] [1771981060.803733288] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981060.808098504] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x8FC6 != 0x46FE
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x6474 != 0x2D44
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xCA06 != 0x15ED
-[limo_base-7] [ERROR] [1771981060.898735336] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x21DF != 0x1E3A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x00BB != 0xB031
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x7476 != 0x2D56
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0xD376 != 0xF5C0
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:40][error] Check Sum 0x872B != 0x6405
-[limo_base-7] [ERROR] [1771981060.959185160] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981061.017965800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981061.038834696] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xF364 != 0xD059
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xD698 != 0xCED5
-[limo_base-7] [ERROR] [1771981061.059193672] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x86EF != 0xECE4
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x70CF != 0x07AB
-[limo_base-7] [ERROR] [1771981061.103028232] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x4B11 != 0x1F82
-[limo_base-7] [ERROR] [1771981061.138891624] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xD581 != 0x6F8E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xA81D != 0xF244
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x433B != 0x6F73
-[limo_base-7] [ERROR] [1771981061.188568552] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x2D09 != 0x4A98
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x6C76 != 0x2D4E
-[limo_base-7] [ERROR] [1771981061.298190760] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xB119 != 0x6FCE
-[limo_base-7] [ERROR] [1771981061.348634056] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xF6AD != 0xFA45
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x20F0 != 0x9536
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x7C08 != 0x6F17
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x02D2 != 0x6D50
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x6075 != 0x2D41
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xEEB7 != 0x6E8B
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xB208 != 0x788E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x6FAD != 0x1478
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xD0F4 != 0x6E1B
-[limo_base-7] [ERROR] [1771981061.606533352] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981061.668555752] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xE843 != 0xFC6C
-[limo_base-7] [ERROR] [1771981061.689082344] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x607B != 0x2D4F
-[limo_base-7] [ERROR] [1771981061.753659464] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x52C1 != 0x6F04
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x343E != 0x4B89
-[limo_base-7] [ERROR] [1771981061.808636712] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x7470 != 0x2D50
-[limo_base-7] [ERROR] [1771981061.849090376] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xA7E5 != 0x48DA
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x436B != 0x6E38
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xD4ED != 0x9786
-[limo_base-7] [ERROR] [1771981061.919238440] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x9A33 != 0x7675
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0xEAF4 != 0xC586
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x14EC != 0xC08E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:41][error] Check Sum 0x0325 != 0x7782
-[limo_base-7] [ERROR] [1771981061.980130440] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xFA1B != 0x926C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x15C4 != 0x5989
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x6476 != 0x2D46
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xEBA6 != 0x6684
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xC0D8 != 0xEEE6
-[limo_base-7] [ERROR] [1771981062.060115912] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x2210 != 0xE95F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xDFBD != 0xF495
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xBF0A != 0x6EE9
-[limo_base-7] [ERROR] [1771981062.099893000] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x0AB4 != 0x348C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x2A18 != 0x566E
-[limo_base-7] [ERROR] [1771981062.159866376] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x9183 != 0x6B74
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x9005 != 0x6E41
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xD689 != 0x4BAD
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x3BDA != 0x6A73
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xE340 != 0x9339
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xD40B != 0x708E
-[limo_base-7] [ERROR] [1771981062.230132744] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x26DD != 0xACFA
-[limo_base-7] [ERROR] [1771981062.257135560] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x4456 != 0x068C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x0217 != 0x1641
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x4474 != 0x2D64
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x873A != 0xF69A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xB774 != 0x12CA
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x8120 != 0x7A73
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x7779 != 0x6EC5
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x2BE6 != 0x6E2C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xF4A9 != 0x0692
-[limo_base-7] [ERROR] [1771981062.429944264] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x7076 != 0x2D52
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xF33F != 0x6723
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x34B5 != 0xC692
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xC626 != 0x695B
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xBA1D != 0xF0D6
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xA3EF != 0x6EFC
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x4780 != 0x4B0C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x7621 != 0x6D79
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x731D != 0xFE2B
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x88F5 != 0x6450
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x1B53 != 0xEFF8
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x9412 != 0x6997
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xE489 != 0x06F9
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xEE44 != 0x4BB3
-[limo_base-7] [ERROR] [1771981062.599882120] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981062.604796584] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x8F30 != 0x2544
-[limo_base-7] [ERROR] [1771981062.640718440] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x77C2 != 0x1431
-[limo_base-7] [ERROR] [1771981062.681173128] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x0732 != 0x944E
-[limo_base-7] [ERROR] [1771981062.729959720] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981062.756642120] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x21B9 != 0x1747
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x5CD4 != 0x4B03
-[limo_base-7] [ERROR] [1771981062.804712648] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0x6585 != 0xCF8C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xA6D1 != 0x95F6
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xDA78 != 0x6EF9
-[limo_base-7] [ERROR] [1771981062.881406600] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xE370 != 0x6FCA
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xE010 != 0x97CF
-[limo_base-7] [ERROR] [1771981062.960837224] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:42][error] Check Sum 0xDA35 != 0x6FF0
-[limo_base-7] [ERROR] [1771981062.981509128] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xC48D != 0x9A81
-[limo_base-7] [ERROR] [1771981063.040278984] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x9D43 != 0xD329
-[limo_base-7] [ERROR] [1771981063.081125288] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x5C75 != 0x2D7D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xF805 != 0xFD32
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x8ACD != 0x49C2
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x3BAA != 0x5209
-[limo_base-7] [ERROR] [1771981063.220938728] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xCCDD != 0x798F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x9B24 != 0x4B51
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xBC82 != 0x68DC
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x0194 != 0x7C93
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x5BFE != 0xC51D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x022C != 0x59E4
-[limo_base-7] [ERROR] [1771981063.355763752] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xFBFF != 0x8E28
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xD5E8 != 0x6FD4
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xBE50 != 0x4BD5
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x6875 != 0x96ED
-[limo_base-7] [ERROR] [1771981063.470764840] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981063.505685768] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x52DA != 0x968D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xCA40 != 0xEDB4
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xC33F != 0x960B
-[limo_base-7] [ERROR] [1771981063.656516936] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1771981063.660911240] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x1534 != 0x6E8D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xD1E0 != 0xDE87
-[limo_base-7] [ERROR] [1771981063.757603048] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xF17B != 0x6F97
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0xB261 != 0x4AA2
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x85B2 != 0x975C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x8A24 != 0xBD7A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:43][error] Check Sum 0x6787 != 0xF7EC
-^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
-[ydlidar_ros2_driver_node-8] [INFO] [1771981063.852809192] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[limo_base-7] [INFO] [1771981063.852976488] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-6] [INFO] [1771981063.852646888] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[ERROR] [limo_base-7]: process has died [pid 166290, exit code -6, cmd '/home/limo/development/ros/ros2_ws/install/limo_base/lib/limo_base/limo_base --ros-args --params-file /tmp/launch_params_8gy01dez'].
-[static_transform_publisher-5] [INFO] [1771981063.852714024] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-3] [INFO] [1771981063.852824392] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-4] [INFO] [1771981063.854966856] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[robot_state_publisher-1] [INFO] [1771981063.863421128] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[limo_base-7] terminate called without an active exception
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x091B != 0x96B3
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0xF428 != 0xE938
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x6818 != 0x4CED
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x3AFA != 0x6E5F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0xA0CF != 0x92B0
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x2E7E != 0xD288
-[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 166281]
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0xAC6A != 0xFDCA
-[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 166277]
-[INFO] [static_transform_publisher-5]: process has finished cleanly [pid 166285]
-[INFO] [static_transform_publisher-6]: process has finished cleanly [pid 166287]
-[INFO] [static_transform_publisher-4]: process has finished cleanly [pid 166283]
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x485E != 0x4913
-[INFO] [joint_state_publisher-2]: process has finished cleanly [pid 166279]
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0xAD6E != 0x680E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0xAC48 != 0x7AFA
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x347F != 0x9303
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x6C76 != 0x2D4E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0xEBDA != 0x6F91
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x7877 != 0x2D5B
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x3292 != 0x11DD
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x440A != 0x6F86
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x1070 != 0x2D34
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x2D8D != 0xFB8F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x44F6 != 0x97B3
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0xCA2B != 0x7513
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0x00CE != 0xC612
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:44][error] Check Sum 0xA005 != 0xECD7
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x655F != 0x7D1C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xEC3C != 0xF234
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xB443 != 0xF38F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xCA40 != 0x6E77
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xEFB9 != 0x79E6
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x9A48 != 0x68C0
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x1876 != 0x2D3A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xD161 != 0xECD5
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xA36B != 0x6E5B
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xB79C != 0x7D47
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x4C7F != 0xFBA8
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x6171 != 0x1FD9
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xC7E9 != 0x7AE5
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x94A2 != 0x6E60
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x826E != 0x6E70
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x0C7D != 0x6E76
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x13B2 != 0x8E97
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xFDD2 != 0x6EEF
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x0661 != 0xF461
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x7E97 != 0x4B3D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x31E1 != 0x6D46
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xCD31 != 0x1339
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x2EA2 != 0x92F3
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xA876 != 0x2C8A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xF108 != 0x968D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x5BC1 != 0xF2F1
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xBA0A != 0x6F0B
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xC41A != 0x4A81
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x8A3D != 0x6CBC
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x3232 != 0x9361
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x27CB != 0x3B13
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xB37C != 0xA417
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x4D3C != 0x7CB4
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xA040 != 0xEE91
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x2C42 != 0x012D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x2B9E != 0x6FF3
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x5693 != 0x4BDB
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0xBC4B != 0x6F04
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:45][error] Check Sum 0x2138 != 0x92CD
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x5698 != 0xAF91
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xB783 != 0x8B88
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x465F != 0x4A2A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x2A84 != 0x9124
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x69E1 != 0x0696
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x4B99 != 0x6E6B
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x7BFE != 0x48FE
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x9112 != 0x6CA3
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x769B != 0x9397
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x1878 != 0x2D34
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x5D5F != 0x488A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xAC46 != 0x7D2A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xA2EA != 0x4B5A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x175D != 0x176D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xF8AE != 0x96FF
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xDC9F != 0xF169
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x04C3 != 0x6F3E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x3F05 != 0x95A4
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x10B7 != 0x4B09
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x1EEE != 0x94A6
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x6A9C != 0x4824
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x6BFB != 0xF3E9
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x79D9 != 0xE215
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xE2E9 != 0x95CD
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x5357 != 0x4A16
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x00E2 != 0x9345
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x5A0A != 0x0780
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xF448 != 0xB3EA
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xC790 != 0x6ACC
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x1ABB != 0x6E1D
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x1C76 != 0x2D3E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0x5B53 != 0x0726
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:46][error] Check Sum 0xCF8D != 0x92C4
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x4F28 != 0x7B52
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x5874 != 0x2D78
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xAFCC != 0x6E61
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xE3D6 != 0x8D88
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xC9AE != 0x1133
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xF4A7 != 0x7800
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xA216 != 0x6E2A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xFA8B != 0x9209
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x7B33 != 0xBD98
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x7476 != 0x2D56
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xB20B != 0xF47C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xF25F != 0x1116
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x4075 != 0x2D61
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xAB12 != 0xC161
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xAA6E != 0x9003
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x6074 != 0x2D40
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x1670 != 0x6F9F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x12CE != 0x16BF
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x487F != 0x6EA9
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x3BEE != 0x4A14
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xD829 != 0x787A
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x4474 != 0x2D64
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xFC3A != 0x11DB
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xF054 != 0x49F6
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x71DF != 0x79CD
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x5B66 != 0x032E
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x687C != 0x6CB5
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x62DD != 0x609F
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x8297 != 0xB864
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x787F != 0x7A80
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x889A != 0x4B3C
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x886A != 0x9290
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x6075 != 0x2D41
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0xC2BB != 0x7DBC
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x7076 != 0x2D52
-[ydlidar_ros2_driver_node-8] [2026-02-25 00:57:47][error] Check Sum 0x9FF0 != 0x6AE3
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Failed to turn on the Lidar, because the lidar is [No error].
-[ydlidar_ros2_driver_node-8] terminate called after throwing an instance of 'rclcpp::exceptions::RCLError'
-[ydlidar_ros2_driver_node-8]   what():  could not create publisher: rcl node's context is invalid, at ./src/rcl/node.c:428
-[ERROR] [ydlidar_ros2_driver_node-8]: process has died [pid 166305, exit code -6, cmd '/home/limo/development/ros/ros2_ws/install/ydlidar_ros2_driver/lib/ydlidar_ros2_driver/ydlidar_ros2_driver_node --ros-args -r __node:=ydlidar_ros2_driver_node -r __ns:=/ --params-file /home/limo/development/ros/ros2_ws/install/ydlidar_ros2_driver/share/ydlidar_ros2_driver/params/TminiPro.yaml'].
+First, find what your LiDAR launch file is called:
+
+ros2 pkg prefix ydlidar_ros2_driver
+ros2 pkg prefix limo_bringup
+
+Now try one of these (depending on what exists on your robot):
+
+Option A (most common): launch ydlidar directly
+ros2 launch ydlidar_ros2_driver ydlidar_launch.py
+
+If that file name doesn’t exist, list available launch files:
+
+ros2 pkg executables ydlidar_ros2_driver
+ros2 pkg prefix ydlidar_ros2_driver
+ls $(ros2 pkg prefix ydlidar_ros2_driver)/share/ydlidar_ros2_driver/launch
+
+Then run the one you see there.
+
+Option B: use the exact params file you were already using
+ros2 run ydlidar_ros2_driver ydlidar_ros2_driver_node --ros-args --params-file \
+$(ros2 pkg prefix ydlidar_ros2_driver)/share/ydlidar_ros2_driver/params/TminiPro.yaml
+2) In a NEW terminal: run your wall follower only
+ros2 run blazerbot_wall_follower wall_follower_node
+
+(If your executable name is different, run ros2 pkg executables blazerbot_wall_follower to see it.)
+
+3) Confirm inputs exist
+Check LiDAR is publishing
+ros2 topic info /scan
+ros2 topic echo /scan --once
+
+You must see Publisher count: 1 and a message print.
+
+4) Confirm wall follower is publishing /cmd_vel
+
+In another terminal:
+
+ros2 topic info /cmd_vel
+ros2 topic echo /cmd_vel
+
+Expected:
+
+Publisher count: 1
+
+echo shows linear.x and angular.z changing over time
+
+If you want a clean “one-shot” check:
+
+ros2 topic echo /cmd_vel --once
+5) If /cmd_vel is still NOT publishing
+
+Two super common causes:
+
+A) Your node is running but never enabling motion
+
+Your current code has self.enabled = False and uses keyboard thread toggling. If you want no button press, you must force enable:
+
+Add in __init__:
+
+self.enabled = True
+self.get_logger().info("Auto-enabled wall follower (no keypress).")
+
+And in control_callback() add at the very top:
+
+if not self.enabled:
+    self.twist_cmd.linear.x = 0.0
+    self.twist_cmd.angular.z = 0.0
+    self.publish_twist_cmd()
+    return
+B) The LiDAR topic name isn’t /scan
+
+Check:
+
+ros2 topic list | grep -i scan
+
+If it’s something like /ydlidar/scan, then change your subscriber topic accordingly.
+
+What to paste back to me (so I can finish fast)
+
+Run these and paste outputs:
+
+ros2 topic info /scan
+ros2 topic info /cmd_vel
+ros2 node list
+ros2 topic list | grep -E "scan|cmd_vel"
+
+Then I’ll tell you exactly what’s wrong (topic mismatch vs enable logic vs node not running).
