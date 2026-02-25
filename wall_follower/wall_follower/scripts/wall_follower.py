@@ -1,205 +1,599 @@
 #!/usr/bin/env python3
-"""
-Wall follower node (AUTO-RUN, no keyboard).
 
-Subscribes:
-  /scan  (sensor_msgs/LaserScan)
-
-Publishes:
-  /cmd_vel (geometry_msgs/Twist)
-"""
-
+import rclpy                                              # rclpy
+from rclpy.node import Node                               # base node
+from rclpy.qos import QoSProfile                          # qos profile
+from rclpy.qos import (HistoryPolicy, ReliabilityPolicy,  # qos policies
+                      DurabilityPolicy, LivelinessPolicy) # qos policies
+from rclpy.executors import MultiThreadedExecutor         # multithreaded executor
+from rclpy.callback_groups import ReentrantCallbackGroup  # reentrant callback group
+from geometry_msgs.msg import Twist   
+from nav_msgs.msg import Odometry    
+from sensor_msgs.msg import LaserScan 
+# standard imports
 import math
-import rclpy
-from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
-from sensor_msgs.msg import LaserScan
-from geometry_msgs.msg import Twist
+import sys
+import select
+import tty
+import termios
+import threading
 
 
-def _finite(x: float) -> bool:
-    return (not math.isinf(x)) and (not math.isnan(x))
 
+#Global Settings
+#Side bias for wall following
+side_choice = "none" # "left" or "right" or "none"
 
+#algorithm choice for wall following behavior
+algo_choice = "min" # "min" or "avg"
+
+#Wall follower Class
 class WallFollower(Node):
     def __init__(self):
-        super().__init__("wall_follower")
-
-        # ---------------- Parameters ----------------
-        self.declare_parameter("side_choice", "none")   # "left" / "right" / "none"
-        self.declare_parameter("algo_choice", "min")    # "min" / "avg"
-        self.declare_parameter("control_hz", 10.0)
-
-        self.declare_parameter("robot_radius", 0.10)
-        self.declare_parameter("side_gap_min", 0.05)    # + radius
-        self.declare_parameter("side_gap_max", 0.10)    # + radius
-        self.declare_parameter("front_gap", 0.40)       # + radius
-
-        self.declare_parameter("lin_slow", 0.10)
-        self.declare_parameter("lin_fast", 0.20)        # safer on real robot
-        self.declare_parameter("ang_slow", 0.08)
-        self.declare_parameter("ang_fast", 0.50)
-
-        self.declare_parameter("max_lin", 0.20)
-        self.declare_parameter("max_ang", 0.80)
-
-        self.declare_parameter("front_window_deg", 15.0)
-        self.declare_parameter("side_window_deg", 15.0)
-
-        # ---------------- Load params ----------------
-        self.side_choice = str(self.get_parameter("side_choice").value).lower()
-        self.algo_choice = str(self.get_parameter("algo_choice").value).lower()
-
-        rr = float(self.get_parameter("robot_radius").value)
-        self.side_threshold_min = rr + float(self.get_parameter("side_gap_min").value)
-        self.side_threshold_max = rr + float(self.get_parameter("side_gap_max").value)
-        self.front_threshold = rr + float(self.get_parameter("front_gap").value)
-
-        self.lin_slow = float(self.get_parameter("lin_slow").value)
-        self.lin_fast = float(self.get_parameter("lin_fast").value)
-        self.ang_slow = float(self.get_parameter("ang_slow").value)
-        self.ang_fast = float(self.get_parameter("ang_fast").value)
-
-        self.max_lin = float(self.get_parameter("max_lin").value)
-        self.max_ang = float(self.get_parameter("max_ang").value)
-
-        self.front_window_deg = float(self.get_parameter("front_window_deg").value)
-        self.side_window_deg = float(self.get_parameter("side_window_deg").value)
-
-        # Angular multiplier based on algo (matches your old logic idea)
-        self.ang_vel_mult = 1.25 if self.algo_choice == "min" else 3.0
-
-        # ---------------- ROS interfaces ----------------
-        qos = QoSProfile(
-            reliability=ReliabilityPolicy.BEST_EFFORT,
-            history=HistoryPolicy.KEEP_LAST,
-            depth=10,
-            durability=DurabilityPolicy.VOLATILE,
-        )
-
-        self.cmd_pub = self.create_publisher(Twist, "/cmd_vel", 10)
-        self.scan_sub = self.create_subscription(LaserScan, "/scan", self.scan_cb, qos)
-
-        # ---------------- State ----------------
-        self.have_scan = False
-        self.wall_found = False
-        self.side_chosen = "none"
-
-        self.scan_left = 10.0
-        self.scan_front = 10.0
-        self.scan_right = 10.0
-
-        self.twist = Twist()
-
-        hz = float(self.get_parameter("control_hz").value)
-        self.timer = self.create_timer(1.0 / max(hz, 1.0), self.control_loop)
-
-        self.get_logger().info("WallFollower started (AUTO-RUN).")
-        self.get_logger().info(f"side_choice={self.side_choice}, algo_choice={self.algo_choice}")
-
-    def scan_cb(self, msg: LaserScan):
-        def angle_to_index(angle_rad: float) -> int:
-            if msg.angle_increment == 0.0:
-                return 0
-            i = int(round((angle_rad - msg.angle_min) / msg.angle_increment))
-            return max(0, min(i, len(msg.ranges) - 1))
-
-        def window_value(center_rad: float, half_window_deg: float, mode: str) -> float:
-            half = math.radians(half_window_deg)
-            i0 = angle_to_index(center_rad - half)
-            i1 = angle_to_index(center_rad + half)
-            if i1 < i0:
-                i0, i1 = i1, i0
-
-            vals = [msg.ranges[i] for i in range(i0, i1 + 1) if _finite(msg.ranges[i])]
-            if not vals:
-                # if nothing finite, return something "far"
-                return msg.range_max if _finite(msg.range_max) else 10.0
-
-            return (sum(vals) / len(vals)) if mode == "avg" else min(vals)
-
-        mode = "avg" if self.algo_choice == "avg" else "min"
-
-        self.scan_front = window_value(0.0, self.front_window_deg, mode)
-        self.scan_right = window_value(-math.pi / 2.0, self.side_window_deg, mode)
-        self.scan_left = window_value(+math.pi / 2.0, self.side_window_deg, mode)
-
-        self.have_scan = True
-
-    def control_loop(self):
-        if not self.have_scan:
-            return
-
-        lin = 0.0
-        ang = 0.0
-
-        if not self.wall_found:
-            # move forward until we detect a wall in front
-            if self.scan_front < self.front_threshold:
-                self.wall_found = True
-
-                # choose side
-                if self.side_choice in ("left", "right"):
-                    self.side_chosen = self.side_choice
-                else:
-                    self.side_chosen = "right" if (self.scan_right < self.scan_left) else "left"
-
-                self.get_logger().info(f"Wall found. Following on: {self.side_chosen}")
-                lin = 0.0
-                ang = 0.0
-            else:
-                lin = self.lin_slow
-                ang = 0.0
-
+        super().__init__('wall_follower')
+        self.get_logger().info("Initializing Wall Follower ...")
+        
+        #Angular velocity multiplier for wall following behavior, set based on algorithm choice
+        if algo_choice == "min":
+            self.ang_vel_mult = 1.250
+        
         else:
-            # obstacle/wall in front -> turn away while creeping forward
-            if self.scan_front < self.front_threshold:
-                lin = self.lin_slow
-                if self.side_chosen == "right":
-                    ang = +self.ang_fast * self.ang_vel_mult  # turn left
+            self.ang_vel_mult = 3.000
+            
+        #Publisher for cmd_vel
+        self.cmd_vel_pub = self.create_publisher(msg_type=Twist,
+                                                 topic="/cmd_vel",
+                                                 qos_profile=10)
+        self.get_logger().info("Initialized /cmd_vel Publisher")
+
+        # declare and initialize callback group
+        self.callback_group = ReentrantCallbackGroup()
+        
+        #LaserScan Subscriber
+        self.scan_sub_qos = QoSProfile(depth=10,
+                                       history=HistoryPolicy.KEEP_LAST,
+                                       reliability=ReliabilityPolicy.BEST_EFFORT,
+                                       durability=DurabilityPolicy.VOLATILE,
+                                       liveliness=LivelinessPolicy.AUTOMATIC)
+        self.scan_sub = self.create_subscription(msg_type=LaserScan,
+                                                 topic="/scan",
+                                                 callback=self.scan_callback,
+                                                 qos_profile=self.scan_sub_qos,
+                                                 callback_group=self.callback_group)
+        self.get_logger().info("Initialized /scan Subscriber")
+        
+        #Odometry Subscriber
+        # declare and initialize odom subscriber
+        self.odom_sub_qos = QoSProfile(depth=10,
+                                       history=HistoryPolicy.KEEP_LAST,
+                                       reliability=ReliabilityPolicy.BEST_EFFORT,
+                                       durability=DurabilityPolicy.VOLATILE,
+                                       liveliness=LivelinessPolicy.AUTOMATIC)
+        self.odom_sub = self.create_subscription(msg_type=Odometry,
+                                                 topic="/odom",
+                                                 callback=self.odom_callback,
+                                                 qos_profile=self.odom_sub_qos,
+                                                 callback_group=self.callback_group)
+        self.get_logger().info("Initialized /odom Subscriber")
+        
+        
+        #Control timer
+        self.control_timer = self.create_timer(timer_period_sec=0.500,
+                                               callback=self.control_callback,
+                                               callback_group=self.callback_group)
+        self.get_logger().info("Initialized Control Timer")
+        
+        #Keyboard handling
+        self.enabled = False
+        self.key_thread = threading.Thread(target=self.keyboard_listener, daemon=True)
+        self.key_thread.start()
+        self.get_logger().info("Press 's' to toggle wall following, 'q' to quit.")
+        
+        self.get_logger().info("Wall Follower Initialized !")
+
+        return None
+    
+    # class destructor
+    def __del__(self):
+        return None
+    
+    #Class variables
+    robot_radius = 0.10                      # 10 cm
+    side_threshold_min = robot_radius + 0.05 #  5 cm gap
+    side_threshold_max = robot_radius + 0.10 # 10 cm gap
+    front_threshold = robot_radius + 0.40    # 40 cm gap
+    pi = 3.141592654
+    pi_inv = 0.318309886
+    ignore_iterations = 5
+    iterations_count = 0
+    # process variables
+    wall_found = False
+    side_chosen = "none"
+    lin_vel_zero = 0.000
+    lin_vel_slow = 0.100
+    lin_vel_fast = 0.250
+    ang_vel_zero = 0.000
+    ang_vel_slow = 0.050
+    ang_vel_fast = 0.500
+    ang_vel_mult = 0.0
+    # velocity publisher variables
+    twist_cmd = Twist()
+    # scan subscriber variables
+    scan_info_done = False
+    scan_angle_min = 0.0
+    scan_angle_max = 0.0
+    scan_angle_inc = 0.0
+    scan_range_min = 0.0
+    scan_range_max = 0.0
+    scan_right_range = 0.0
+    scan_front_range = 0.0
+    scan_left_range = 0.0
+    scan_angle_range = 0
+    scan_ranges_size = 0
+    scan_right_index = 0
+    scan_front_index = 0
+    scan_left_index = 0
+    scan_sides_angle_range = 15 # degs
+    scan_front_angle_range = 15 # degs
+    scan_right_range_from_index = 0
+    scan_right_range_to_index = 0
+    scan_front_range_from_index = 0
+    scan_front_range_to_index = 0
+    scan_left_range_from_index = 0
+    scan_left_range_to_index = 0
+    # odom subscriber variables
+    odom_info_done = False
+    odom_initial_x = 0.0
+    odom_initial_y = 0.0
+    odom_initial_yaw = 0.0
+    odom_curr_x = 0.0
+    odom_curr_y = 0.0
+    odom_curr_yaw = 0.0
+    odom_prev_x = 0.0
+    odom_prev_y = 0.0
+    odom_prev_yaw = 0.0
+    odom_distance = 0.0
+    odom_lin_vel = 0.0
+    odom_ang_vel = 0.0
+    angles = dict()
+    
+    
+    #Keyboard listener function
+    def keyboard_listener(self):
+        # Save terminal settings
+        old_settings = termios.tcgetattr(sys.stdin)
+        tty.setcbreak(sys.stdin.fileno())
+        try:
+            while rclpy.ok():
+                if select.select([sys.stdin], [], [], 0.1)[0]:
+                    key = sys.stdin.read(1)
+                    if key == 's':
+                        self.enabled = not self.enabled
+                        self.get_logger().info(f"Wall following {'ENABLED' if self.enabled else 'DISABLED'}")
+                        if not self.enabled:
+                            # Stop the robot immediately when disabled
+                            self.twist_cmd.linear.x = 0.0
+                            self.twist_cmd.angular.z = 0.0
+                            self.cmd_vel_pub.publish(self.twist_cmd)
+                    elif key == 'q':
+                        self.get_logger().info("Quit requested.")
+                        rclpy.shutdown()
+                        break
+        except Exception as e:
+            self.get_logger().error(f"Keyboard thread error: {e}")
+        finally:
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+            
+    #Scan callback function
+    def scan_callback(self, scan_msg):
+        if (self.scan_info_done):
+            if (algo_choice == "avg"):
+                scan_right_range_sum = 0.0
+                scan_front_range_sum = 0.0
+                scan_left_range_sum = 0.0
+                scan_right_count = 0
+                scan_front_count = 0
+                scan_left_count = 0
+                
+                # loop through the scan ranges and accumulate the sum of segments
+                for index in range(0, self.scan_ranges_size):
+                    if (not math.isinf(scan_msg.ranges[index])):
+                        if ((index >= self.scan_right_range_from_index) and
+                            (index <= self.scan_right_range_to_index)):
+                            scan_right_range_sum += scan_msg.ranges[index]
+                            scan_right_count += 1
+                        if ((index >= self.scan_front_range_from_index) and
+                            (index <= self.scan_front_range_to_index)):
+                            scan_front_range_sum += scan_msg.ranges[index]
+                            scan_front_count += 1
+                        if ((index >= self.scan_left_range_from_index) and
+                            (index <= self.scan_left_range_to_index)):
+                            scan_left_range_sum += scan_msg.ranges[index]
+                            scan_left_count += 1
+                    else:
+                        # otherwise discard the scan range with infinity as value
+                        pass
+                # calculate the average of each segment
+                if (scan_right_count > 0):
+                    self.scan_right_range = (scan_right_range_sum / scan_right_count)
                 else:
-                    ang = -self.ang_fast * self.ang_vel_mult  # turn right
+                    self.scan_right_range = self.scan_range_min
+                if (scan_front_count > 0):
+                    self.scan_front_range = (scan_front_range_sum / scan_front_count)
+                else:
+                    self.scan_front_range = self.scan_range_min
+                if (scan_left_count > 0):
+                    self.scan_left_range = (scan_left_range_sum / scan_left_count)
+                else:
+                    self.scan_left_range = self.scan_range_min
+                # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
             else:
-                # follow wall by keeping distance in a band
-                lin = self.lin_fast
-                if self.side_chosen == "right":
-                    if self.scan_right < self.side_threshold_min:
-                        ang = +self.ang_slow
-                    elif self.scan_right > self.side_threshold_max:
-                        ang = -self.ang_slow
+                # otherwise use minimum ranges
+                # if algo_choice is set to "min" or anything else
+                # initialize variables to hold minimum values
+                scan_right_range_min = self.scan_range_max
+                scan_front_range_min = self.scan_range_max
+                scan_left_range_min = self.scan_range_max
+                # loop through the scan ranges and get the minimum value
+                for index in range(0, self.scan_ranges_size):
+                    if (not math.isinf(scan_msg.ranges[index])):
+                        if ((index >= self.scan_right_range_from_index) and
+                            (index <= self.scan_right_range_to_index)):
+                            if (scan_right_range_min > scan_msg.ranges[index]):
+                                scan_right_range_min = scan_msg.ranges[index]
+                            else:
+                                pass
+                        if ((index >= self.scan_front_range_from_index) and
+                            (index <= self.scan_front_range_to_index)):
+                            if (scan_front_range_min > scan_msg.ranges[index]):
+                                scan_front_range_min = scan_msg.ranges[index]
+                            else:
+                                pass
+                        if ((index >= self.scan_left_range_from_index) and
+                            (index <= self.scan_left_range_to_index)):
+                            if (scan_left_range_min > scan_msg.ranges[index]):
+                                scan_left_range_min = scan_msg.ranges[index]
+                            else:
+                                pass
                     else:
-                        ang = 0.0
+                        # otherwise discard the scan range with infinity as value
+                        pass
+                # set the range values to their minimum values
+                if (self.scan_right_range > 0.0):
+                    self.scan_right_range = scan_right_range_min
                 else:
-                    if self.scan_left < self.side_threshold_min:
-                        ang = -self.ang_slow
-                    elif self.scan_left > self.side_threshold_max:
-                        ang = +self.ang_slow
+                    self.scan_right_range = self.scan_range_min
+                if (self.scan_front_range > 0.0):
+                    self.scan_front_range = scan_front_range_min
+                else:
+                    self.scan_front_range = self.scan_range_min
+                if (self.scan_left_range > 0.0):
+                    self.scan_left_range = scan_left_range_min
+                else:
+                    self.scan_left_range = self.scan_range_min
+                
+        else:
+            # do this step only once
+            # get the min and max angles
+            self.scan_angle_min = scan_msg.angle_min
+            self.scan_angle_max = scan_msg.angle_max
+            # get the min and max range values
+            self.scan_range_min = scan_msg.range_min
+            self.scan_range_max = scan_msg.range_max
+            # get the size of the ranges array
+            self.scan_ranges_size = len(scan_msg.ranges)
+            # get the total scan angle range
+            self.scan_angle_range = int((abs(self.scan_angle_min) +
+                                         abs(self.scan_angle_max)) *
+                                        (180.0 / self.pi))
+            # get the angle increments per scan ray
+            self.scan_angle_inc = (self.scan_angle_range / self.scan_ranges_size)
+            # calculate the front, right and left scan ray indexes
+            self.scan_front_index = (self.scan_ranges_size / 2)
+            self.scan_right_index = (self.scan_front_index -
+                                     int(90.0 / self.scan_angle_inc) - 1)
+            self.scan_left_index = (self.scan_front_index +
+                                    int(90.0 / self.scan_angle_inc) + 1)
+            # calculate the front scan ray ranges
+            self.scan_front_range_from_index = (self.scan_front_index -
+                                                int(self.scan_front_angle_range /
+                                                    self.scan_angle_inc))
+            self.scan_front_range_to_index = (self.scan_front_index +
+                                              int(self.scan_front_angle_range /
+                                                  self.scan_angle_inc))
+            # calculate right and left scan ray ranges
+            if (self.scan_angle_range > 180):
+                self.scan_right_range_from_index = (self.scan_right_index -
+                                                    int(self.scan_sides_angle_range /
+                                                        self.scan_angle_inc))
+                self.scan_right_range_to_index = (self.scan_right_index +
+                                                  int(self.scan_sides_angle_range /
+                                                      self.scan_angle_inc))
+                self.scan_left_range_from_index = (self.scan_left_index -
+                                                   int(self.scan_sides_angle_range /
+                                                       self.scan_angle_inc))
+                self.scan_left_range_to_index = (self.scan_left_index +
+                                                 int(self.scan_sides_angle_range /
+                                                     self.scan_angle_inc))
+            else:
+                self.scan_right_range_from_index = self.scan_right_index
+                self.scan_right_range_to_index = (self.scan_right_index +
+                                                  int(self.scan_sides_angle_range /
+                                                      self.scan_angle_inc))
+                self.scan_left_range_from_index = (self.scan_left_index -
+                                                   int(self.scan_sides_angle_range /
+                                                       self.scan_angle_inc))
+                self.scan_left_range_to_index = self.scan_left_index
+            # set flag to true so this step will not be done again
+            self.scan_info_done = True
+            # print scan details
+            self.get_logger().info("~~~~~ Start Scan Info ~~~~")
+            self.get_logger().info("scan_angle_min: %+0.3f" % (self.scan_angle_min))
+            self.get_logger().info("scan_angle_max: %+0.3f" % (self.scan_angle_max))
+            self.get_logger().info("scan_range_min: %+0.3f" % (self.scan_range_min))
+            self.get_logger().info("scan_range_max: %+0.3f" % (self.scan_range_max))
+            self.get_logger().info("scan_angle_range: %d" % (self.scan_angle_range))
+            self.get_logger().info("scan_ranges_size: %d" % (self.scan_ranges_size))
+            self.get_logger().info("scan_angle_inc: %+0.3f" % (self.scan_angle_inc))
+            self.get_logger().info("scan_right_index: %d" % (self.scan_right_index))
+            self.get_logger().info("scan_front_index: %d" % (self.scan_front_index))
+            self.get_logger().info("scan_left_index: %d" % (self.scan_left_index))
+            self.get_logger().info("scan_right_range_index:")
+            self.get_logger().info("from: %d ~~~> to: %d" %
+                                   (self.scan_right_range_from_index,
+                                    self.scan_right_range_to_index))
+            self.get_logger().info("scan_front_range_index:")
+            self.get_logger().info("from: %d ~~~> to: %d" %
+                                   (self.scan_front_range_from_index,
+                                    self.scan_front_range_to_index))
+            self.get_logger().info("scan_left_range_index:")
+            self.get_logger().info("from: %d ~~~> to: %d" %
+                                   (self.scan_left_range_from_index,
+                                    self.scan_left_range_to_index))
+            self.get_logger().info("~~~~~ End Scan Info ~~~~")
+        return None
+    
+    #Odom callback function
+    def odom_callback(self, odom_msg):
+        if (self.odom_info_done):
+            # do this step continuously
+            # get current odometry values
+            self.odom_curr_x = odom_msg.pose.pose.position.x
+            self.odom_curr_y = odom_msg.pose.pose.position.y
+            angles = self.euler_from_quaternion(odom_msg.pose.pose.orientation.x,
+                                                odom_msg.pose.pose.orientation.y,
+                                                odom_msg.pose.pose.orientation.z,
+                                                odom_msg.pose.pose.orientation.w)
+            self.odom_curr_yaw = angles["yaw_deg"]
+            # calculate distance based on current and previous odometry values
+            self.odom_distance += self.calculate_distance(self.odom_prev_x,
+                                                          self.odom_prev_y,
+                                                          self.odom_curr_x,
+                                                          self.odom_curr_y)
+            # set previous odometry values to current odometry values
+            self.odom_prev_x = self.odom_curr_x
+            self.odom_prev_y = self.odom_curr_y
+            self.odom_prev_yaw = self.odom_curr_yaw
+        else:
+            # do this step only once
+            # get initial odometry values
+            self.odom_initial_x = odom_msg.pose.pose.position.x
+            self.odom_initial_y = odom_msg.pose.pose.position.y
+            angles = self.euler_from_quaternion(odom_msg.pose.pose.orientation.x,
+                                                odom_msg.pose.pose.orientation.y,
+                                                odom_msg.pose.pose.orientation.z,
+                                                odom_msg.pose.pose.orientation.w)
+            self.odom_initial_yaw = angles["yaw_deg"]
+            # set previous odometry values to initial odometry values
+            self.odom_prev_x = self.odom_initial_x
+            self.odom_prev_y = self.odom_initial_y
+            self.odom_prev_yaw = self.odom_initial_yaw
+            # set flag to true so this step will not be done again
+            self.odom_info_done = True
+            # print odom details
+            self.get_logger().info("~~~~~ Start Odom Info ~~~~")
+            self.get_logger().info("odom_initial_x: %+0.3f" % (self.odom_initial_x))
+            self.get_logger().info("odom_initial_y: %+0.3f" % (self.odom_initial_y))
+            self.get_logger().info("odom_initial_yaw: %+0.3f" % (self.odom_initial_yaw))
+            self.get_logger().info("~~~~~ End Odom Info ~~~~")
+        return None
+    
+    def control_callback(self):
+        if (self.iterations_count >= self.ignore_iterations):
+            # fix for delayed laser scanner startup
+            if (self.wall_found):
+                # now the robot is either facing the wall after finding the wall
+                # or running the wall follower process and facing a wall or obstacle
+                if (self.scan_front_range < self.front_threshold):
+                    # turn towards the side opposite to the wall while moving forward
+                    self.twist_cmd.linear.x = self.lin_vel_slow
+                    if (self.side_chosen == "right"):
+                        # turn the robot to the left
+                        self.twist_cmd.angular.z = (self.ang_vel_fast * self.ang_vel_mult)
+                    elif (self.side_chosen == "left"):
+                        # turn the robot to the right
+                        self.twist_cmd.angular.z = (-self.ang_vel_fast * self.ang_vel_mult)
                     else:
-                        ang = 0.0
+                        # otherwise do nothing
+                        # this choice will never happen
+                        pass
+                else:
+                    # otherwise keep going straight
+                    # until either onstacle or wall is detected
+                    self.twist_cmd.linear.x = self.lin_vel_fast
+                    # check the closeness to the wall
+                    if (self.side_chosen == "right"):
+                        # wall is on the right
+                        if (self.scan_right_range < self.side_threshold_min):
+                            # turn left to move away from the wall
+                            self.twist_cmd.angular.z = self.ang_vel_slow
+                        elif (self.scan_right_range > self.side_threshold_max):
+                            # turn right to move close to the wall
+                            self.twist_cmd.angular.z = -self.ang_vel_slow
+                        else:
+                            # do not turn and keep going straight
+                            self.twist_cmd.angular.z = self.ang_vel_zero
+                    elif (self.side_chosen == "left"):
+                        # wall is on the left
+                        if (self.scan_left_range < self.side_threshold_min):
+                            # turn right to move away from the wall
+                            self.twist_cmd.angular.z = -self.ang_vel_slow
+                        elif (self.scan_left_range > self.side_threshold_max):
+                            # turn left to move close to the wall
+                            self.twist_cmd.angular.z = self.ang_vel_slow
+                        else:
+                            # do not turn and keep going straight
+                            self.twist_cmd.angular.z = self.ang_vel_zero
+                    else:
+                        # otherwise do nothing
+                        # this choice will never happen
+                        pass
+            else:
+                # find the wall closest to the robot
+                # keep moving forward until the robot detects
+                # an obstacle or wall in its front
+                if (self.scan_front_range < self.front_threshold):
+                    # immediately set the wall_found flag to true
+                    # to break out of this subprocess
+                    self.wall_found = True
+                    self.get_logger().info("Wall Found!")
+                    # stop the robot
+                    self.twist_cmd.linear.x = self.lin_vel_zero
+                    self.twist_cmd.angular.z = self.ang_vel_zero
+                    self.get_logger().info("Robot Stopped!")
+                    # choose a side to turn if side_choice is set to none
+                    if ((side_choice != "right") and
+                        (side_choice != "left")):
+                        # choose the side that has closer range value
+                        # closer range value indicates that the wall is on that side
+                        if (self.scan_right_range < self.scan_left_range):
+                            # wall is on the right
+                            self.side_chosen = "right"
+                        elif (self.scan_right_range > self.scan_left_range):
+                            # wall is on the left
+                            self.side_chosen = "left"
+                        else:
+                            # otherwise do nothing
+                            # this choice will never happen
+                            pass
+                        self.get_logger().info("Side Chosen: %s" % (self.side_chosen))
+                    else:
+                        # otherwise do nothing
+                        # side is already set by the user
+                        pass
+                else:
+                    # otherwise keep going straight slowly
+                    # until either onstacle or wall is detected
+                    self.twist_cmd.linear.x = self.lin_vel_slow
+                    self.twist_cmd.angular.z = self.ang_vel_zero
+        else:
+            # just increment the iterations count
+            self.iterations_count += 1
+            # keep the robot stopped
+            self.twist_cmd.linear.x = self.lin_vel_zero
+            self.twist_cmd.angular.z = self.ang_vel_zero
+        # publish the twist command
+        self.publish_twist_cmd()
+        # print the current iteration information
+        self.print_info()
+        return None
+    
+    def publish_twist_cmd(self):
+        # linear speed control
+        if (self.twist_cmd.linear.x >= 0.150):
+          self.twist_cmd.linear.x = 0.150
+        else:
+          # do nothing
+          pass
+        # angular speed control
+        if (self.twist_cmd.angular.z >= 0.450):
+          self.twist_cmd.angular.z = 0.450
+        else:
+          # do nothing
+          pass
+        # publish command
+        self.cmd_vel_pub.publish(self.twist_cmd)
+        return None
+                    
+    def print_info(self):
+        self.get_logger().info("Scan: L: %0.3f F: %0.3f R: %0.3f" %
+                               (self.scan_left_range, self.scan_front_range,
+                                self.scan_right_range))
+        self.get_logger().info("Odom: X: %+0.3f Y: %+0.3f" %
+                               (self.odom_curr_x, self.odom_curr_y))
+        self.get_logger().info("Odom: Yaw: %+0.3f Dist: %0.3f" %
+                               (self.odom_curr_yaw, self.odom_distance))
+        self.get_logger().info("Vel: Lin: %+0.3f Ang: %+0.3f" %
+                               (self.twist_cmd.linear.x, self.twist_cmd.angular.z))
+        self.get_logger().info("~~~~~~~~~~")
+        return None
+    
+    def calculate_distance(self, prev_x, prev_y, curr_x, curr_y):
+        # function to calculate euclidean distance in 2d plane
 
-        # clamp
-        lin = max(-self.max_lin, min(self.max_lin, lin))
-        ang = max(-self.max_ang, min(self.max_ang, ang))
+        #calculate distance
+        distance = ((((curr_x - prev_x) ** 2.0) +
+                     ((curr_y - prev_y) ** 2.0)) ** 0.50)
 
-        self.twist.linear.x = float(lin)
-        self.twist.angular.z = float(ang)
-        self.cmd_pub.publish(self.twist)
+        #return the distance value
+        return distance
 
+    def euler_from_quaternion(self, quat_x, quat_y, quat_z, quat_w):
+        # function to convert quaternions to euler angles
 
+        # calculate roll
+        sinr_cosp = 2 * (quat_w * quat_x + quat_y * quat_z)
+        cosr_cosp = 1 - 2 * (quat_x * quat_x + quat_y * quat_y)
+        roll_rad = math.atan2(sinr_cosp, cosr_cosp)
+        roll_deg = (roll_rad * 180 * self.pi_inv)
+
+        # calculate pitch
+        sinp = 2 * (quat_w * quat_y - quat_z * quat_x)
+        pitch_rad = math.asin(sinp)
+        pitch_deg = (pitch_rad * 180 * self.pi_inv)
+
+        # calculate yaw
+        siny_cosp = 2 * (quat_w * quat_z + quat_x * quat_y)
+        cosy_cosp = 1 - 2 * (quat_y * quat_y + quat_z * quat_z)
+        yaw_rad = math.atan2(siny_cosp, cosy_cosp)
+        yaw_deg = (yaw_rad * 180 * self.pi_inv)
+
+        # store the angle values in a dict
+        angles = dict()
+        angles["roll_rad"] = roll_rad
+        angles["roll_deg"] = roll_deg
+        angles["pitch_rad"] = pitch_rad
+        angles["pitch_deg"] = pitch_deg
+        angles["yaw_rad"] = yaw_rad
+        angles["yaw_deg"] = yaw_deg
+
+        # return the angle values
+        return angles
+            
 def main(args=None):
     rclpy.init(args=args)
-    node = WallFollower()
+    wall_follower_node = WallFollower()
+    executor = MultiThreadedExecutor(num_threads=4)
+    executor.add_node(wall_follower_node)
+    
     try:
-        rclpy.spin(node)
+        executor.spin()
     except KeyboardInterrupt:
-        pass
+        pass    
     finally:
-        # stop on exit
-        stop = Twist()
-        node.cmd_pub.publish(stop)
-        node.destroy_node()
+        wall_follower_node.get_logger().info("Stopping the robot ...")
+        wall_follower_node.twist_cmd.linear.x = wall_follower_node.lin_vel_zero
+        wall_follower_node.twist_cmd.angular.z = wall_follower_node.ang_vel_zero
+        wall_follower_node.publish_twist_cmd()
+        wall_follower_node.get_logger().info("Wall Follower Stopped !")
+        executor.shutdown()
+        wall_follower_node.destroy_node()
         rclpy.shutdown()
-
 
 if __name__ == "__main__":
     main()
+
+
+        
+        
+        
