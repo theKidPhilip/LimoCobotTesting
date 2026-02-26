@@ -38,3 +38,16 @@ limo_ros2 …
 ➜ 
 
 ros2 topic pub -1 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}, angular: {z: 0.8}}"
+
+Build + run (commands)
+Build
+cd ~/development/ros/ros2_ws
+colcon build --packages-select limo_base
+source install/setup.bash
+Run forcing diff-drive
+Easiest (no launch edits):
+ros2 run limo_base limo_base --ros-args -p force_motion_mode:=0
+
+Then check:
+
+ros2 topic echo /limo_status --once
