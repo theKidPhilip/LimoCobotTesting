@@ -1,293 +1,149 @@
-# !/usr/bin/env python3
-
-import rclpy
-from rclpy.node import Node
-from rclpy.qos import QoSProfile
-from rclpy.qos import HistoryPolicy, ReliabilityPolicy, DurabilityPolicy, LivelinessPolicy
-from rclpy.executors import MultiThreadedExecutor
-from rclpy.callback_groups import ReentrantCallbackGroup
-
-from geometry_msgs.msg import Twist
-from sensor_msgs.msg import LaserScan
-
-import math
-import sys
-import select
-import tty
-import termios
-import threading
-
-# ---------------- GLOBAL SETTINGS ----------------
-
-side_choice = "none"   # "left" or "right" or "none"
-
-# ---------------- WALL FOLLOWER ----------------
-
-class WallFollower(Node):
-
-    def __init__(self):
-        super().__init__('ackermann_wall_follower')
-
-        self.get_logger().info("Initializing Ackermann Wall Follower...")
-
-        # ---------------- Robot Parameters ----------------
-
-        self.robot_radius = 0.10
-
-        # IMPORTANT: larger detection distance for car-like robot
-        self.front_threshold = 0.75
-        self.side_threshold_min = 0.18
-        self.side_threshold_max = 0.28
-
-        # Speeds
-        self.lin_zero = 0.0
-        self.lin_slow = 0.12
-        self.lin_fast = 0.18
-        self.lin_reverse = -0.08
-
-        self.ang_zero = 0.0
-        self.ang_turn = 0.6
-        self.ang_adjust = 0.25
-
-        # State machine
-        self.wall_found = False
-        self.side_chosen = "none"
-        self.escape_mode = False
-        self.escape_counter = 0
-
-        # Scan variables
-        self.scan_ready = False
-        self.scan_right = float('inf')
-        self.scan_left = float('inf')
-        self.scan_front = float('inf')
-
-        self.twist_cmd = Twist()
-
-        # Publisher
-        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
-
-        qos = QoSProfile(
-            depth=10,
-            history=HistoryPolicy.KEEP_LAST,
-            reliability=ReliabilityPolicy.BEST_EFFORT,
-            durability=DurabilityPolicy.VOLATILE,
-            liveliness=LivelinessPolicy.AUTOMATIC
-        )
-
-        self.callback_group = ReentrantCallbackGroup()
-
-        self.scan_sub = self.create_subscription(
-            LaserScan,
-            "/scan",
-            self.scan_callback,
-            qos,
-            callback_group=self.callback_group
-        )
-
-        self.control_timer = self.create_timer(
-            0.1,
-            self.control_callback,
-            callback_group=self.callback_group
-        )
-
-        # Keyboard
-        self.enabled = False
-        self.key_thread = threading.Thread(target=self.keyboard_listener, daemon=True)
-        self.key_thread.start()
-
-        self.get_logger().info("Press 's' to toggle, 'q' to quit.")
-
-    # -------------------------------------------------
-    # ---------------- KEYBOARD -----------------------
-    # -------------------------------------------------
-
-    def keyboard_listener(self):
-        old_settings = termios.tcgetattr(sys.stdin)
-        tty.setcbreak(sys.stdin.fileno())
-
-        try:
-            while rclpy.ok():
-                if select.select([sys.stdin], [], [], 0.1)[0]:
-                    key = sys.stdin.read(1)
-
-                    if key == 's':
-                        self.enabled = not self.enabled
-                        self.get_logger().info(
-                            f"Wall Following {'ENABLED' if self.enabled else 'DISABLED'}"
-                        )
-                        if not self.enabled:
-                            self.stop_robot()
-
-                    elif key == 'q':
-                        rclpy.shutdown()
-                        break
-        finally:
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
-
-    # -------------------------------------------------
-    # ---------------- SCAN CALLBACK ------------------
-    # -------------------------------------------------
-
-    def scan_callback(self, msg):
-
-        ranges = msg.ranges
-        size = len(ranges)
-        center = size // 2
-
-        right_index = center - 90
-        left_index = center + 90
-
-        if 0 <= center < size:
-            self.scan_front = ranges[center]
-
-        if 0 <= right_index < size:
-            self.scan_right = ranges[right_index]
-
-        if 0 <= left_index < size:
-            self.scan_left = ranges[left_index]
-
-        self.scan_ready = True
-
-    # -------------------------------------------------
-    # ---------------- CONTROL ------------------------
-    # -------------------------------------------------
-
-    def control_callback(self):
-
-        if not self.enabled or not self.scan_ready:
-            return
-
-        # ---------------- ESCAPE MODE ----------------
-        # Reverse first to create turning radius
-
-        if self.escape_mode:
-
-            if self.escape_counter < 5:
-                # Reverse straight
-                self.twist_cmd.linear.x = self.lin_reverse
-                self.twist_cmd.angular.z = 0.0
-                self.escape_counter += 1
-
-            else:
-                # Turn while moving forward
-                self.twist_cmd.linear.x = self.lin_slow
-                if self.side_chosen == "right":
-                    self.twist_cmd.angular.z = self.ang_turn
-                else:
-                    self.twist_cmd.angular.z = -self.ang_turn
-
-                # Exit escape if front is clear
-                if self.scan_front > self.front_threshold:
-                    self.escape_mode = False
-                    self.escape_counter = 0
-
-            self.publish()
-            return
-
-        # ---------------- FIND WALL ----------------
-
-        if not self.wall_found:
-
-            if self.scan_front < self.front_threshold:
-                self.wall_found = True
-
-                if side_choice == "none":
-                    if self.scan_right < self.scan_left:
-                        self.side_chosen = "right"
-                    else:
-                        self.side_chosen = "left"
-                else:
-                    self.side_chosen = side_choice
-
-                self.get_logger().info(f"Following {self.side_chosen} wall")
-            else:
-                self.twist_cmd.linear.x = self.lin_slow
-                self.twist_cmd.angular.z = 0.0
-                self.publish()
-                return
-
-        # ---------------- FRONT OBSTACLE ----------------
-
-        if self.scan_front < self.front_threshold:
-            self.escape_mode = True
-            self.escape_counter = 0
-            return
-
-        # ---------------- WALL FOLLOWING ----------------
-
-        self.twist_cmd.linear.x = self.lin_fast
-
-        if self.side_chosen == "right":
-
-            if self.scan_right < self.side_threshold_min:
-                self.twist_cmd.angular.z = self.ang_adjust
-
-            elif self.scan_right > self.side_threshold_max:
-                self.twist_cmd.angular.z = -self.ang_adjust
-
-            else:
-                self.twist_cmd.angular.z = 0.0
-
-        elif self.side_chosen == "left":
-
-            if self.scan_left < self.side_threshold_min:
-                self.twist_cmd.angular.z = -self.ang_adjust
-
-            elif self.scan_left > self.side_threshold_max:
-                self.twist_cmd.angular.z = self.ang_adjust
-
-            else:
-                self.twist_cmd.angular.z = 0.0
-
-        self.publish()
-
-    # -------------------------------------------------
-    # ---------------- UTILITIES ----------------------
-    # -------------------------------------------------
-
-    def publish(self):
-
-        # Clamp linear
-        if self.twist_cmd.linear.x > 0.2:
-            self.twist_cmd.linear.x = 0.2
-        if self.twist_cmd.linear.x < -0.1:
-            self.twist_cmd.linear.x = -0.1
-
-        # Clamp angular
-        if self.twist_cmd.angular.z > 0.8:
-            self.twist_cmd.angular.z = 0.8
-        if self.twist_cmd.angular.z < -0.8:
-            self.twist_cmd.angular.z = -0.8
-
-        self.cmd_vel_pub.publish(self.twist_cmd)
-
-    def stop_robot(self):
-        self.twist_cmd.linear.x = 0.0
-        self.twist_cmd.angular.z = 0.0
-        self.cmd_vel_pub.publish(self.twist_cmd)
-
-# -------------------------------------------------
-
-# ---------------- MAIN ---------------------------
-
-# -------------------------------------------------
-
-def main(args=None):
-    rclpy.init(args=args)
-    node = WallFollower()
-
-    executor = MultiThreadedExecutor(num_threads=4)
-    executor.add_node(node)
-
-    try:
-        executor.spin()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        node.stop_robot()
-        executor.shutdown()
-        node.destroy_node()
-        rclpy.shutdown()
-
-if __name__ == "__main__":
-    main()
+/*
+
+* Copyright (c) 2021, Agilex Roboti#include <rclcpp/rclcpp.hpp>
+# include <rclcpp/executor.hpp>
+# include <nav_msgs/msg/odometry.hpp>
+# include <geometry_msgs/msg/twist.hpp>
+# include <tf2_ros/transform_broadcaster.h>
+# include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+# include <sensor_msgs/msg/imu.hpp>ll rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+this
+* list of conditions and the following disclaimer.
+*
+* 1. Redistributions in binary form must reproduce the above copyright notice,
+* this list of conditions and the following disclaimer in the documentation
+* and/or other materials provided with the distribution.
+*
+* 1. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE
+* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+# ifndef LIMO_DRIVER_H
+# define LIMO_DRIVER_H
+
+# include <iostream>
+# include <thread>
+# include <memory>
+# include <atomic>
+# include <cstdlib>
+# include <chrono>
+# include "rclcpp/rclcpp.hpp"
+# include <rclcpp/executor.hpp>
+# include <nav_msgs/msg/odometry.hpp>
+# include <geometry_msgs/msg/twist.hpp>
+# include <tf2_ros/transform_broadcaster.h>
+# include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+# include <sensor_msgs/msg/imu.hpp>
+
+# include "std_msgs/msg/string.hpp"
+# include "limo_msgs/msg/limo_status.hpp"
+// #include <ros/ros.h>
+// #include <tf/transform_broadcaster.h>
+// #include <tf/tf.h>
+// #include <nav_msgs/Odometry.h>
+// #include <sensor_msgs/Imu.h>
+// #include <limo_base/LimoStatus.h>
+# include "limo_base/serial_port.h"
+# include "limo_base/limo_protocol.h"
+
+namespace AgileX {
+
+    class LimoDriver : public rclcpp::Node {
+       public:
+        LimoDriver(std::string node_name);
+        ~LimoDriver();
+        void run();
+
+       private:
+        void connect(std::string dev_name, uint32_t bouadrate);
+        void readData();
+        void processRxData(uint8_t data);
+        void parseFrame(const LimoFrame& frame);
+        void sendFrame(const LimoFrame& frame);
+        void setMotionCommand(double linear_vel, double steer_angle,
+                              double lateral_vel, double angular_vel);
+        void enableCommandedMode();
+        void processErrorCode(uint16_t error_code);
+        void twistCmdCallback(const geometry_msgs::msg::Twist::SharedPtr msg);
+        double normalizeAngle(double angle);
+        double degToRad(double deg);
+        double convertInnerAngleToCentral(double inner_angle);
+        double convertCentralAngleToInner(double central_angle);
+        void publishOdometry(double stamp, double linear_velocity,
+                             double angular_velocity, double lateral_velocity,
+                             double steering_angle);
+        void publishLimoState(double stamp, uint8_t vehicle_state,
+                              uint8_t control_mode, double battery_voltage,
+                              uint16_t error_code, int8_t motion_mode);
+        void publishIMUData(double stamp);
+
+       private:
+        rclcpp::Node* node_;
+        std::shared_ptr<SerialPort> port_;
+        std::shared_ptr<std::thread> read_data_thread_;
+
+        std::atomic<bool> keep_running_;
+
+        std::string port_name_;
+        std::string odom_frame_;
+        std::string base_frame_;
+        std::string odom_topic_name_;
+
+        bool pub_odom_tf_ = false;
+        bool use_mcnamu_ = false;
+        double present_theta_, last_theta_, delta_theta_, real_theta_, rad;
+        rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
+        rclcpp::Publisher<limo_msgs::msg::LimoStatus>::SharedPtr
+            status_publisher_;
+
+        rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr
+            motion_cmd_sub_;
+        // rclcpp::Subscription<scout_msgs::msg::ScoutLightCmd>::SharedPtr
+        //   light_cmd_sub_;
+        rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_publisher_;
+        std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
+        // ros::Publisher odom_publisher_;
+        // ros::Publisher status_publisher_;
+        // ros::Publisher imu_publisher_;
+        // ros::Subscriber motion_cmd_sub_;
+        // tf::TransformBroadcaster tf_broadcaster_;
+
+        double position_x_ = 0.0;
+        double position_y_ = 0.0;
+        double theta_ = 0.0;
+
+        ImuData imu_data_;
+        uint8_t motion_mode_;  // current motion type
+        int force_motion_mode_ = -1; // -1 = follow firmware, 0/1/2 = force mode
+
+        static constexpr double max_inner_angle_ = 0.48869;  // 28 degree
+        static constexpr double track_ =
+            0.172;  // m (left right wheel distance)
+        static constexpr double wheelbase_ =
+            0.2;  // m (front rear wheel distance)
+        static constexpr double left_angle_scale_ = 2.47;
+        static constexpr double right_angle_scale_ = 2.47;
+    };
+
+}  // namespace AgileX
+
+# endif  // LIMO_DRIVER_H
