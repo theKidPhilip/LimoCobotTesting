@@ -2,70 +2,37 @@
 
 
 
-[INFO] Current ROS2 workspace: ros2_ws
-
-limo_ros2 on  testing [!?] on 🐳 v29.1.4 …
-➜ ros2 topic list | grep -E "cmd_vel|cmd|twist|drive|steer|wheel"
-
-limo_ros2 …
-➜ ros2 topic list | grep -E "cmd_vel"                            
-/cmd_vel
-
-limo_ros2 on  testing [!?] …
-➜ ros2 topic list                    
-/cmd_vel
-/imu
-/joint_states
-/limo_status
-/odom
-/parameter_events
-/robot_description
-/rosout
-/scan
-/tf
-/tf_static
-/ydlidar_ros2_driver_node/transition_event
-
-limo_ros2 on  testing [!?] on 🐳 v29.1.4 …
-➜ ros2 topic info /cmd_vel
-Type: geometry_msgs/msg/Twist
-Publisher count: 0
-Subscription count: 1
-
-limo_ros2 …
-➜ ros2 topic info /cmd_vel
-Type: geometry_msgs/msg/Twist
-Publisher count: 1
-Subscription count: 1
-
-limo_ros2 …
-➜ ros2 node info /limo_base
-/limo_base
-  Subscribers:
-    /cmd_vel: geometry_msgs/msg/Twist
-    /parameter_events: rcl_interfaces/msg/ParameterEvent
-  Publishers:
-    /imu: sensor_msgs/msg/Imu
-    /limo_status: limo_msgs/msg/LimoStatus
-    /odom: nav_msgs/msg/Odometry
-    /parameter_events: rcl_interfaces/msg/ParameterEvent
-    /rosout: rcl_interfaces/msg/Log
-    /tf: tf2_msgs/msg/TFMessage
-  Service Servers:
-    /limo_base/describe_parameters: rcl_interfaces/srv/DescribeParameters
-    /limo_base/get_parameter_types: rcl_interfaces/srv/GetParameterTypes
-    /limo_base/get_parameters: rcl_interfaces/srv/GetParameters
-    /limo_base/list_parameters: rcl_interfaces/srv/ListParameters
-    /limo_base/set_parameters: rcl_interfaces/srv/SetParameters
-    /limo_base/set_parameters_atomically: rcl_interfaces/srv/SetParametersAtomically
-  Service Clients:
-
-  Action Servers:
-
-  Action Clients:
-
-
 limo_ros2 …
 ➜ 
 
-limo_ro
+limo_ros2 on  testing [!?] …
+➜ ros2 topic echo /limo_status --once
+header:
+  stamp:
+    sec: 1
+    nanosec: 772067603
+  frame_id: ''
+vehicle_state: 0
+control_mode: 1
+battery_voltage: 11.9
+error_code: 0
+motion_mode: 1
+---
+
+limo_ros2 took 2.2s …
+➜ grep -R "MODE_FOUR_DIFF" -n limo_base                    
+limo_base/include/limo_base/limo_protocol.h:98:    MODE_FOUR_DIFF = 0x00,
+limo_base/src/limo_driver.cpp:472:            case MODE_FOUR_DIFF: {
+limo_base/src/limo_driver.cpp:580:            case MODE_FOUR_DIFF: {
+
+limo_ros2 on  testing [!?] …
+➜ grep -R "CONFIG" -n limo_base        
+limo_base/include/limo_base/limo_protocol.h:65:#define MSG_CTRL_MODE_CONFIG_ID 0x421
+limo_base/src/limo_driver.cpp:418:        frame.id = MSG_CTRL_MODE_CONFIG_ID;
+
+limo_ros2 …
+➜ grep -R "0x4" -n limo_base/include/limo_base
+limo_base/include/limo_base/limo_protocol.h:65:#define MSG_CTRL_MODE_CONFIG_ID 0x421
+
+limo_ros2 …
+➜ 
