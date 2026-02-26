@@ -1,0 +1,263 @@
+evelopment/ros/ros2_ws …
+➜ ros2 launch blazerbot_bringup robot_bringup.launch.py                                       
+[INFO] [launch]: All log files can be found below /home/limo/.ros/log/2026-02-26-01-52-48-482408-ashlimo01-10519
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [limo_base-7]: process started with pid [10560]
+[INFO] [ydlidar_ros2_driver_node-8]: process started with pid [10562]
+[INFO] [wall_follower-9]: process started with pid [10564]
+[INFO] [robot_state_publisher-1]: process started with pid [10548]
+[INFO] [joint_state_publisher-2]: process started with pid [10550]
+[INFO] [static_transform_publisher-3]: process started with pid [10552]
+[INFO] [static_transform_publisher-4]: process started with pid [10554]
+[INFO] [static_transform_publisher-5]: process started with pid [10556]
+[INFO] [static_transform_publisher-6]: process started with pid [10558]
+[static_transform_publisher-4] [WARN] [1772070769.095912032] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-6] [WARN] [1772070769.095912288] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-5] [WARN] [1772070769.120741952] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-3] [WARN] [1772070769.126464608] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-4] [INFO] [1772070769.171555104] [base_link_to_laser_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-4] translation: ('0.180000', '0.000000', '0.000000')
+[static_transform_publisher-4] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-4] from 'base_link' to 'laser_link'
+[static_transform_publisher-3] [INFO] [1772070769.183595936] [base_footprint_to_base_link_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.150000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'base_footprint' to 'base_link'
+[limo_base-7] Loading parameters: 
+[limo_base-7] - port name: ttyTHS1
+[limo_base-7] - odom frame name: odom
+[limo_base-7] - base frame name: base_link
+[limo_base-7] - odom topic name: 1
+[limo_base-7] - use_mcnamu_: 0
+[limo_base-7] - force_motion_mode_: -1
+[ydlidar_ros2_driver_node-8] [INFO] [1772070769.205695808] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Current ROS Driver Version: 1.0.1
+[ydlidar_ros2_driver_node-8] 
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK initializing
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK has been initialized
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK Version: 1.2.7
+[limo_base-7] [INFO] [1772070769.233476928] [limo_base]: connet the serial port:'/dev/ttyTHS1'
+[limo_base-7] [INFO] [1772070769.240273888] [limo_base]: enableCommandedMode :
+[limo_base-7] [INFO] [1772070769.240414688] [limo_base]: Open the serial port:'/dev/ttyTHS1'
+[static_transform_publisher-6] [INFO] [1772070769.266581280] [base_link_to_imu_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-6] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-6] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-6] from 'base_link' to 'imu_link'
+[static_transform_publisher-5] [INFO] [1772070769.278366848] [base_link_to_camera_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-5] translation: ('0.180000', '0.000000', '0.180000')
+[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-5] from 'base_link' to 'camera_link'
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar successfully connected [/dev/ttyUSB0:230400]
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] [INFO] [1772070769.350854464] [robot_state_publisher]: got segment base_footprint
+[robot_state_publisher-1] [INFO] [1772070769.351154912] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-1] [INFO] [1772070769.351183968] [robot_state_publisher]: got segment depth_camera_link
+[robot_state_publisher-1] [INFO] [1772070769.351197216] [robot_state_publisher]: got segment depth_link
+[robot_state_publisher-1] [INFO] [1772070769.351206656] [robot_state_publisher]: got segment front_left_wheel_link
+[robot_state_publisher-1] [INFO] [1772070769.351217344] [robot_state_publisher]: got segment front_right_wheel_link
+[robot_state_publisher-1] [INFO] [1772070769.351226848] [robot_state_publisher]: got segment imu_link
+[robot_state_publisher-1] [INFO] [1772070769.351235584] [robot_state_publisher]: got segment inertial_link
+[robot_state_publisher-1] [INFO] [1772070769.351245120] [robot_state_publisher]: got segment laser_link
+[robot_state_publisher-1] [INFO] [1772070769.351253376] [robot_state_publisher]: got segment rear_left_wheel_link
+[robot_state_publisher-1] [INFO] [1772070769.351262336] [robot_state_publisher]: got segment rear_right_wheel_link
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar running correctly! The health status: good
+[wall_follower-9] [INFO] [1772070769.944501696] [wall_follower]: Initializing Ackermann Wall Follower...
+[joint_state_publisher-2] [INFO] [1772070769.947915424] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
+[wall_follower-9] Exception in thread Thread-1 (keyboard_listener):
+[wall_follower-9] Traceback (most recent call last):
+[wall_follower-9]   File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+[wall_follower-9]     self.run()
+[wall_follower-9] [INFO] [1772070770.018291104] [wall_follower]: Press 's' to toggle, 'q' to quit.
+[wall_follower-9]   File "/usr/lib/python3.10/threading.py", line 953, in run
+[wall_follower-9]     self._target(*self._args, **self._kwargs)
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/python3.10/site-packages/wall_follower/scripts/wall_follower.py", line 105, in keyboard_listener
+[wall_follower-9]     old_settings = termios.tcgetattr(sys.stdin)
+[wall_follower-9] termios.error: (25, 'Inappropriate ioctl for device')
+[ydlidar_ros2_driver_node-8] Current Lidar Model Code 151
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Baseplate device info
+[ydlidar_ros2_driver_node-8] Firmware version: 1.2
+[ydlidar_ros2_driver_node-8] Hardware version: 1
+[ydlidar_ros2_driver_node-8] Model: Tmini Plus
+[ydlidar_ros2_driver_node-8] Serial: 2024092600090187
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 1019 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0x86E148E0
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2097 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Scan Frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Fixed Size: 400
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Sample Rate: 4.00K
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to check the lidar, Elapsed time 0 ms
+[ydlidar_ros2_driver_node-8] [2026-02-26 01:52:52][info] [YDLIDAR] Now lidar is scanning...
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[limo_base-7] [INFO] [1772070831.710926496] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-1] [INFO] [1772070831.710979872] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [static_transform_publisher-6]: process has finished cleanly [pid 10558]
+[INFO] [static_transform_publisher-4]: process has finished cleanly [pid 10554]
+[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 10548]
+[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 10552]
+[INFO] [static_transform_publisher-5]: process has finished cleanly [pid 10556]
+[ERROR] [limo_base-7]: process has died [pid 10560, exit code -6, cmd '/home/limo/development/ros/ros2_ws/install/limo_base/lib/limo_base/limo_base --ros-args --params-file /tmp/launch_params_84zzzscm'].
+[INFO] [joint_state_publisher-2]: process has finished cleanly [pid 10550]
+[ERROR] [wall_follower-9]: process has died [pid 10564, exit code 1, cmd '/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower --ros-args -r __node:=wall_follower'].
+[static_transform_publisher-6] [INFO] [1772070831.711129792] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-3] [INFO] [1772070831.711888224] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ydlidar_ros2_driver_node-8] [INFO] [1772070831.713490240] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[limo_base-7] terminate called without an active exception
+[ydlidar_ros2_driver_node-8] [INFO] [1772070831.741837984] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Now YDLIDAR is stopping .......
+[wall_follower-9] Traceback (most recent call last):
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower", line 33, in <module>
+[wall_follower-9]     sys.exit(load_entry_point('wall-follower==0.0.0', 'console_scripts', 'wall_follower')())
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/python3.10/site-packages/wall_follower/scripts/wall_follower.py", line 287, in main
+[wall_follower-9]     node.stop_robot()
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/python3.10/site-packages/wall_follower/scripts/wall_follower.py", line 267, in stop_robot
+[wall_follower-9]     self.cmd_vel_pub.publish(self.twist_cmd)
+[wall_follower-9]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/publisher.py", line 70, in publish
+[wall_follower-9]     self.__publisher.publish(msg)
+[wall_follower-9] rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[static_transform_publisher-4] [INFO] [1772070831.714619648] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-5] [INFO] [1772070831.715234976] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Now lidar scanning has stopped!
+[INFO] [ydlidar_ros2_driver_node-8]: process has finished cleanly [pid 10562]
+
+development/ros/ros2_ws took 1m 5.4s …
+➜ ros2 launch blazerbot_bringup robot_bringup.launch.py
+[INFO] [launch]: All log files can be found below /home/limo/.ros/log/2026-02-26-01-55-53-635311-ashlimo01-13317
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [limo_base-7]: process started with pid [13383]
+[INFO] [ydlidar_ros2_driver_node-8]: process started with pid [13412]
+[INFO] [wall_follower-9]: process started with pid [13420]
+[INFO] [robot_state_publisher-1]: process started with pid [13367]
+[INFO] [joint_state_publisher-2]: process started with pid [13369]
+[INFO] [static_transform_publisher-3]: process started with pid [13371]
+[INFO] [static_transform_publisher-4]: process started with pid [13373]
+[INFO] [static_transform_publisher-5]: process started with pid [13375]
+[INFO] [static_transform_publisher-6]: process started with pid [13377]
+[static_transform_publisher-3] [WARN] [1772070954.186773728] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-4] [WARN] [1772070954.186593696] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-5] [WARN] [1772070954.186753632] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-6] [WARN] [1772070954.208824608] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-4] [INFO] [1772070954.253757888] [base_link_to_laser_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-4] translation: ('0.180000', '0.000000', '0.000000')
+[static_transform_publisher-4] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-4] from 'base_link' to 'laser_link'
+[static_transform_publisher-3] [INFO] [1772070954.263421728] [base_footprint_to_base_link_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.150000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'base_footprint' to 'base_link'
+[static_transform_publisher-5] [INFO] [1772070954.284971744] [base_link_to_camera_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-5] translation: ('0.180000', '0.000000', '0.180000')
+[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-5] from 'base_link' to 'camera_link'
+[static_transform_publisher-6] [INFO] [1772070954.335309952] [base_link_to_imu_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-6] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-6] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-6] from 'base_link' to 'imu_link'
+[ydlidar_ros2_driver_node-8] [INFO] [1772070954.362332032] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Current ROS Driver Version: 1.0.1
+[ydlidar_ros2_driver_node-8] 
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK initializing
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK has been initialized
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK Version: 1.2.7
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] [INFO] [1772070954.376454688] [robot_state_publisher]: got segment base_footprint
+[robot_state_publisher-1] [INFO] [1772070954.378524192] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-1] [INFO] [1772070954.378597344] [robot_state_publisher]: got segment depth_camera_link
+[robot_state_publisher-1] [INFO] [1772070954.378613152] [robot_state_publisher]: got segment depth_link
+[robot_state_publisher-1] [INFO] [1772070954.378625984] [robot_state_publisher]: got segment front_left_wheel_link
+[robot_state_publisher-1] [INFO] [1772070954.378636832] [robot_state_publisher]: got segment front_right_wheel_link
+[robot_state_publisher-1] [INFO] [1772070954.378646304] [robot_state_publisher]: got segment imu_link
+[robot_state_publisher-1] [INFO] [1772070954.378655360] [robot_state_publisher]: got segment inertial_link
+[robot_state_publisher-1] [INFO] [1772070954.378665152] [robot_state_publisher]: got segment laser_link
+[robot_state_publisher-1] [INFO] [1772070954.378674080] [robot_state_publisher]: got segment rear_left_wheel_link
+[robot_state_publisher-1] [INFO] [1772070954.378683136] [robot_state_publisher]: got segment rear_right_wheel_link
+[limo_base-7] Loading parameters: 
+[limo_base-7] - port name: ttyTHS1
+[limo_base-7] - odom frame name: odom
+[limo_base-7] - base frame name: base_link
+[limo_base-7] - odom topic name: 1
+[limo_base-7] - use_mcnamu_: 0
+[limo_base-7] - force_motion_mode_: -1
+[limo_base-7] [INFO] [1772070954.413931200] [limo_base]: connet the serial port:'/dev/ttyTHS1'
+[limo_base-7] [INFO] [1772070954.416951616] [limo_base]: enableCommandedMode :
+[limo_base-7] [INFO] [1772070954.417071680] [limo_base]: Open the serial port:'/dev/ttyTHS1'
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar successfully connected [/dev/ttyUSB0:230400]
+[wall_follower-9] [INFO] [1772070954.967512128] [wall_follower]: Initializing Ackermann Wall Follower...
+[joint_state_publisher-2] [INFO] [1772070955.033309824] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
+[wall_follower-9] Exception in thread Thread-1 (keyboard_listener):
+[wall_follower-9] Traceback (most recent call last):
+[wall_follower-9]   File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+[wall_follower-9]     self.run()
+[wall_follower-9]   File "/usr/lib/python3.10/threading.py", line 953, in run
+[wall_follower-9]     self._target(*self._args, **self._kwargs)
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/python3.10/site-packages/wall_follower/scripts/wall_follower.py", line 105, in keyboard_listener
+[wall_follower-9]     old_settings = termios.tcgetattr(sys.stdin)
+[wall_follower-9] termios.error: (25, 'Inappropriate ioctl for device')
+[wall_follower-9] [INFO] [1772070955.038092992] [wall_follower]: Press 's' to toggle, 'q' to quit.
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar running correctly! The health status: good
+[ydlidar_ros2_driver_node-8] Current Lidar Model Code 151
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Baseplate device info
+[ydlidar_ros2_driver_node-8] Firmware version: 1.2
+[ydlidar_ros2_driver_node-8] Hardware version: 1
+[ydlidar_ros2_driver_node-8] Model: Tmini Plus
+[ydlidar_ros2_driver_node-8] Serial: 2024092600090187
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 974 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0x916A78E0
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2098 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Scan Frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Fixed Size: 400
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Sample Rate: 4.00K
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to check the lidar, Elapsed time 0 ms
+[ydlidar_ros2_driver_node-8] [2026-02-26 01:55:57][info] [YDLIDAR] Now lidar is scanning...
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[ydlidar_ros2_driver_node-8] [INFO] [1772070982.077716800] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[limo_base-7] [INFO] [1772070982.078625152] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[limo_base-7] terminate called without an active exception
+[static_transform_publisher-6] [INFO] [1772070982.078043104] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-4] [INFO] [1772070982.078091360] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ydlidar_ros2_driver_node-8] [INFO] [1772070982.161448576] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Now YDLIDAR is stopping .......
+[static_transform_publisher-3] [INFO] [1772070982.079649568] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-1] [INFO] [1772070982.080083552] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-5] [INFO] [1772070982.080541536] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[wall_follower-9] Traceback (most recent call last):
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower", line 33, in <module>
+[wall_follower-9]     sys.exit(load_entry_point('wall-follower==0.0.0', 'console_scripts', 'wall_follower')())
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/python3.10/site-packages/wall_follower/scripts/wall_follower.py", line 287, in main
+[wall_follower-9]     node.stop_robot()
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/python3.10/site-packages/wall_follower/scripts/wall_follower.py", line 267, in stop_robot
+[wall_follower-9]     self.cmd_vel_pub.publish(self.twist_cmd)
+[wall_follower-9]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/publisher.py", line 70, in publish
+[wall_follower-9]     self.__publisher.publish(msg)
+[wall_follower-9] rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[INFO] [static_transform_publisher-5]: process has finished cleanly [pid 13375]
+[INFO] [static_transform_publisher-4]: process has finished cleanly [pid 13373]
+[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 13371]
+[INFO] [static_transform_publisher-6]: process has finished cleanly [pid 13377]
+[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 13367]
+[ERROR] [limo_base-7]: process has died [pid 13383, exit code -6, cmd '/home/limo/development/ros/ros2_ws/install/limo_base/lib/limo_base/limo_base --ros-args --params-file /tmp/launch_params_5i51b448'].
+[INFO] [joint_state_publisher-2]: process has finished cleanly [pid 13369]
+[ERROR] [wall_follower-9]: process has died [pid 13420, exit code 1, cmd '/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower --ros-args -r __node:=wall_follower'].
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Now lidar scanning has stopped!
+[INFO] [ydlidar_ros2_driver_node-8]: process has finished cleanly [pid 13412]
