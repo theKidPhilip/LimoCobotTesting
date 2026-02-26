@@ -36,3 +36,5 @@ limo_base/include/limo_base/limo_protocol.h:65:#define MSG_CTRL_MODE_CONFIG_ID 0
 
 limo_ros2 …
 ➜ 
+
+ros2 topic pub -1 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}, angular: {z: 0.8}}"
