@@ -15,30 +15,35 @@
 # Positive error  → robot too far from wall  → steer toward wall
 # Negative error  → robot too close to wall  → steer away
 #
-# The integral term corrects steady-state bias (e.g. the robot
-# consistently running 2 cm too far from the wall).  Anti-windup
-# clamps the integral so it cannot grow unbounded on long straight
-# sections or when the robot is stuck.
+# Changes made vs old version:
+#  1) Increased speeds (Gazebo looked slow)
+#  2) Increased angular cap so it can steer properly at higher speed
+#  3) Added "slow down on sharp turns" for stability at higher speed
+#  4) Reduced logging rate (logs every 1 second instead of every 0.1s)
 # ============================================================
 
-import rclpy
-from rclpy.node import Node
-from rclpy.qos import QoSProfile
-from rclpy.qos import (HistoryPolicy, ReliabilityPolicy,
-                       DurabilityPolicy, LivelinessPolicy)
-from rclpy.executors import MultiThreadedExecutor
-from rclpy.callback_groups import ReentrantCallbackGroup
-from geometry_msgs.msg import Twist
-from nav_msgs.msg import Odometry
-from sensor_msgs.msg import LaserScan
-
 import math
-import sys
 import select
-import tty
+import sys
 import termios
 import threading
 import time
+import tty
+
+import rclpy
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.node import Node
+from rclpy.qos import (
+    DurabilityPolicy,
+    HistoryPolicy,
+    LivelinessPolicy,
+    QoSProfile,
+    ReliabilityPolicy,
+)
+from sensor_msgs.msg import LaserScan
 
 # ─────────────────────────────────────────────
 # Global Settings
@@ -48,6 +53,7 @@ import time
 side_choice = "none"
 
 # Scan aggregation: "min" | "avg"
+# If you see jitter at higher speed, try "avg"
 algo_choice = "min"
 
 # ─── PID Gains ───────────────────────────────
@@ -73,12 +79,20 @@ class WallFollowerPID(Node):
     desired_wall_dist = robot_radius + 0.075   # midpoint setpoint
     front_threshold = robot_radius + 0.40
 
-    # ── velocity limits ──────────────────────────────────────────
+    # ── velocity limits (UPDATED: faster) ───────────────────────
     lin_vel_zero = 0.000
-    lin_vel_slow = 0.100
-    lin_vel_fast = 0.200
+    lin_vel_slow = 0.200          # was 0.100
+    lin_vel_fast = 0.450          # was 0.200
     ang_vel_zero = 0.000
-    ang_vel_max = 0.500
+    ang_vel_max = 1.200           # was 0.500
+
+    # ── dynamic speed scaling (NEW) ─────────────────────────────
+    # When turning hard, reduce forward speed so it doesn't crash / oscillate.
+    turn_slowdown_gain = 0.60     # 0.0 = no slowdown, 0.6 is a good start
+
+    # ── logging throttling (NEW) ────────────────────────────────
+    # 10 Hz control loop -> print debug every 10 ticks = 1 second
+    debug_every_ticks = 10
 
     # ── math helpers ─────────────────────────────────────────────
     pi = 3.141592654
@@ -137,10 +151,13 @@ class WallFollowerPID(Node):
     # ── velocity command ─────────────────────────────────────────
     twist_cmd = Twist()
 
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
     def __init__(self):
         super().__init__('wall_follower_pid')
         self.get_logger().info("Initialising Wall Follower (PID Control) ...")
+
+        # (NEW) debug tick counter for throttling logs
+        self.debug_tick = 0
 
         self.cmd_vel_pub = self.create_publisher(
             msg_type=Twist, topic="/cmd_vel", qos_profile=10)
@@ -185,11 +202,16 @@ class WallFollowerPID(Node):
         self.key_thread = threading.Thread(
             target=self.keyboard_listener, daemon=True)
         self.key_thread.start()
+
         self.get_logger().info("Press 's' to toggle wall following, 'q' to quit.")
-        self.get_logger().info("Wall Follower PID Initialised !")
+        self.get_logger().info(
+            f"Speed caps: lin_fast={self.lin_vel_fast:.2f} m/s, "
+            f"lin_slow={self.lin_vel_slow:.2f} m/s, ang_max={self.ang_vel_max:.2f} rad/s"
+        )
         self.get_logger().info(
             "PID Gains: Kp=%.3f  Ki=%.3f  Kd=%.3f  I_max=%.3f" %
             (Kp, Ki, Kd, INTEGRAL_MAX))
+        self.get_logger().info("Wall Follower PID Initialised !")
 
     # ─── keyboard ────────────────────────────────────────────────
     def keyboard_listener(self):
@@ -228,7 +250,7 @@ class WallFollowerPID(Node):
     def _process_scan_ranges(self, scan_msg):
         if algo_choice == "avg":
             r_sum, f_sum, l_sum = 0.0, 0.0, 0.0
-            r_cnt, f_cnt, l_cnt = 0,   0,   0
+            r_cnt, f_cnt, l_cnt = 0, 0, 0
             for i, r in enumerate(scan_msg.ranges):
                 if math.isinf(r):
                     continue
@@ -241,6 +263,7 @@ class WallFollowerPID(Node):
                 if self.scan_left_range_from_index <= i <= self.scan_left_range_to_index:
                     l_sum += r
                     l_cnt += 1
+
             self.scan_right_range = (
                 r_sum / r_cnt) if r_cnt else self.scan_range_min
             self.scan_front_range = (
@@ -258,6 +281,7 @@ class WallFollowerPID(Node):
                     f_min = min(f_min, r)
                 if self.scan_left_range_from_index <= i <= self.scan_left_range_to_index:
                     l_min = min(l_min, r)
+
             self.scan_right_range = r_min if r_min > 0.0 else self.scan_range_min
             self.scan_front_range = f_min if f_min > 0.0 else self.scan_range_min
             self.scan_left_range = l_min if l_min > 0.0 else self.scan_range_min
@@ -283,14 +307,13 @@ class WallFollowerPID(Node):
         self.scan_front_range_to_index = (self.scan_front_index +
                                           int(self.scan_front_angle_range / self.scan_angle_inc))
 
+        half = int(self.scan_sides_angle_range / self.scan_angle_inc)
         if self.scan_angle_range > 180:
-            half = int(self.scan_sides_angle_range / self.scan_angle_inc)
             self.scan_right_range_from_index = self.scan_right_index - half
             self.scan_right_range_to_index = self.scan_right_index + half
             self.scan_left_range_from_index = self.scan_left_index - half
             self.scan_left_range_to_index = self.scan_left_index + half
         else:
-            half = int(self.scan_sides_angle_range / self.scan_angle_inc)
             self.scan_right_range_from_index = self.scan_right_index
             self.scan_right_range_to_index = self.scan_right_index + half
             self.scan_left_range_from_index = self.scan_left_index - half
@@ -345,7 +368,11 @@ class WallFollowerPID(Node):
             self._follow_wall_pid()
 
         self._publish()
-        self._print_info()
+
+        # (UPDATED) Print info only every 1 second to reduce lag
+        self.debug_tick += 1
+        if self.debug_tick % self.debug_every_ticks == 0:
+            self._print_info()
 
     # ── phase 1: drive toward nearest wall ───────────────────────
     def _search_for_wall(self):
@@ -358,6 +385,7 @@ class WallFollowerPID(Node):
                 self.side_chosen = "right" if self.scan_right_range <= self.scan_left_range else "left"
             else:
                 self.side_chosen = side_choice
+
             self.get_logger().info(f"Side chosen: {self.side_chosen}")
 
             # Initialise PID state cleanly
@@ -374,9 +402,7 @@ class WallFollowerPID(Node):
         self.pid_prev_time = now
 
         # ── relevant side range ───────────────────────────────────
-        side_range = (self.scan_right_range
-                      if self.side_chosen == "right"
-                      else self.scan_left_range)
+        side_range = self.scan_right_range if self.side_chosen == "right" else self.scan_left_range
 
         # ── PID terms ─────────────────────────────────────────────
         error = self.desired_wall_dist - side_range
@@ -393,28 +419,33 @@ class WallFollowerPID(Node):
             (Kd * derivative)
 
         # ── sign convention ───────────────────────────────────────
-        if self.side_chosen == "right":
-            angular_correction = -pid_output
-        else:
-            angular_correction = pid_output
+        angular_correction = -pid_output if self.side_chosen == "right" else pid_output
 
         # ── obstacle avoidance overrides PID ─────────────────────
         if self.scan_front_range < self.front_threshold:
             # Hard escape turn; reset integral so it doesn't fight recovery
             self.pid_integral = 0.0
             self.twist_cmd.linear.x = self.lin_vel_slow
-            if self.side_chosen == "right":
-                self.twist_cmd.angular.z = self.ang_vel_max
-            else:
-                self.twist_cmd.angular.z = -self.ang_vel_max
+            self.twist_cmd.angular.z = self.ang_vel_max if self.side_chosen == "right" else -self.ang_vel_max
         else:
-            self.twist_cmd.linear.x = self.lin_vel_fast
+            # Normal PID tracking
             self.twist_cmd.angular.z = angular_correction
 
-        self.get_logger().info(
-            "PID | err=%+.4f  intg=%+.4f  deriv=%+.4f  out=%+.4f  ang=%+.4f" %
-            (error, self.pid_integral, derivative, pid_output,
-             self.twist_cmd.angular.z))
+            # (NEW) Slow down on sharp turns for stability at higher speed
+            turn_strength = abs(self.twist_cmd.angular.z) / \
+                self.ang_vel_max  # 0..1
+            self.twist_cmd.linear.x = self.lin_vel_fast * \
+                (1.0 - self.turn_slowdown_gain * turn_strength)
+            self.twist_cmd.linear.x = max(
+                self.twist_cmd.linear.x, self.lin_vel_slow)
+
+        # (UPDATED) PID debug log only every 1 second to reduce lag
+        if self.debug_tick % self.debug_every_ticks == 0:
+            self.get_logger().info(
+                "PID | err=%+.4f  intg=%+.4f  deriv=%+.4f  out=%+.4f  ang=%+.4f  lin=%+.4f" %
+                (error, self.pid_integral, derivative, pid_output,
+                 self.twist_cmd.angular.z, self.twist_cmd.linear.x)
+            )
 
     # ─── helpers ─────────────────────────────────────────────────
     def _reset_pid(self):
@@ -429,7 +460,7 @@ class WallFollowerPID(Node):
 
     def _publish(self):
         self.twist_cmd.linear.x = max(
-            min(self.twist_cmd.linear.x,  self.lin_vel_fast), -self.lin_vel_fast)
+            min(self.twist_cmd.linear.x, self.lin_vel_fast), -self.lin_vel_fast)
         self.twist_cmd.angular.z = max(
             min(self.twist_cmd.angular.z, self.ang_vel_max), -self.ang_vel_max)
         self.cmd_vel_pub.publish(self.twist_cmd)
@@ -463,9 +494,9 @@ class WallFollowerPID(Node):
         yaw_rad = math.atan2(siny, cosy)
 
         return {
-            "roll_rad":  roll_rad,  "roll_deg":  roll_rad * 180 * self.pi_inv,
+            "roll_rad": roll_rad, "roll_deg": roll_rad * 180 * self.pi_inv,
             "pitch_rad": pitch_rad, "pitch_deg": pitch_rad * 180 * self.pi_inv,
-            "yaw_rad":   yaw_rad,   "yaw_deg":   yaw_rad * 180 * self.pi_inv,
+            "yaw_rad": yaw_rad, "yaw_deg": yaw_rad * 180 * self.pi_inv,
         }
 
 
