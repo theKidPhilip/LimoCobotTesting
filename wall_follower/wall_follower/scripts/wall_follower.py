@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
+# ============================================================
 # File: wall_follower_node.py
-# Package: blazerbot_wall_follower
+# Package: blazerbot_wall_follower (or wall_follower)
 # Node: wall_follower_node
 #
 # Purpose:
 #   ROS2 PD wall follower using LaserScan on 'scan' and publishing Twist on 'cmd_vel'.
 #   Works for differential-drive robots.
+#
+# Fixes included (from your log):
+#   1) QoS compatibility for /scan (BEST_EFFORT) to match many LiDAR drivers
+#      -> fixes: "incompatible QoS... RELIABILITY"
+#   2) Safe shutdown publish (guards publish with rclpy.ok())
+#      -> fixes: "publisher's context is invalid"
+# ============================================================
 
 import math
 import time
@@ -14,6 +22,7 @@ from typing import Optional
 import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from sensor_msgs.msg import LaserScan
 
 
@@ -42,7 +51,9 @@ class WallFollowerNode(Node):
     def __init__(self) -> None:
         super().__init__("wall_follower_node")
 
-        #  Parameters
+        # ----------------------------
+        # Parameters
+        # ----------------------------
         # Wall-following goal
         self.declare_parameter("wall_distance", 0.5)      # meters
         self.declare_parameter("safety_distance", 0.35)   # meters
@@ -62,8 +73,9 @@ class WallFollowerNode(Node):
         self.declare_parameter("right_deg", -90.0)
         self.declare_parameter("window_half_width_deg", 10.0)
 
+        # ----------------------------
         # Type-safe parameter getters
-        # These remove the "Unknown | None" static type error from editors.
+        # ----------------------------
         def get_param_float(name: str) -> float:
             value = self.get_parameter(name).value
             if value is None:
@@ -76,7 +88,7 @@ class WallFollowerNode(Node):
                 raise ValueError(f"Parameter '{name}' is None")
             return str(value)
 
-        # Read parameters (type-safe)
+        # Read parameters
         self.wall_distance = get_param_float("wall_distance")
         self.safety_distance = get_param_float("safety_distance")
         self.linear_speed = get_param_float("linear_speed")
@@ -104,13 +116,25 @@ class WallFollowerNode(Node):
             self.front_right_deg = +abs(self.front_right_deg)
             self.right_deg = +abs(self.right_deg)
 
+        # ----------------------------
+        # QoS for /scan (IMPORTANT FIX)
+        # ----------------------------
+        # Many LiDAR drivers publish LaserScan with BEST_EFFORT reliability.
+        # If our subscriber uses RELIABLE (default), ROS2 will refuse to connect.
+        # So we match BEST_EFFORT here.
+        qos_scan = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10,
+        )
+
         # ROS interfaces
         self.scan_sub = self.create_subscription(
-            LaserScan, "scan", self.scan_callback, 10
+            LaserScan, "scan", self.scan_callback, qos_scan
         )
         self.cmd_pub = self.create_publisher(Twist, "cmd_vel", 10)
 
-        #  Controller state
+        # Controller state
         self.latest_scan: Optional[LaserScan] = None
         self.last_error: float = 0.0
         self.last_time: Optional[float] = None
@@ -141,12 +165,9 @@ class WallFollowerNode(Node):
         scan = self.latest_scan
 
         # Read key distances using angle windows
-        front = self.get_min_range_in_window(
-            scan, self.front_deg, self.window_half_width_deg)
-        side = self.get_min_range_in_window(
-            scan, self.right_deg, self.window_half_width_deg)
-        front_side = self.get_min_range_in_window(
-            scan, self.front_right_deg, self.window_half_width_deg)
+        front = self.get_min_range_in_window(scan, self.front_deg, self.window_half_width_deg)
+        side = self.get_min_range_in_window(scan, self.right_deg, self.window_half_width_deg)
+        front_side = self.get_min_range_in_window(scan, self.front_right_deg, self.window_half_width_deg)
 
         # Compute dt for derivative term
         now = time.time()
@@ -158,27 +179,28 @@ class WallFollowerNode(Node):
 
         cmd = Twist()
 
+        # Safety: obstacle ahead
         if front < self.safety_distance:
             cmd.linear.x = 0.0
-            cmd.angular.z = (
-                +self.max_angular_speed if self.follow_side == "right" else -self.max_angular_speed
-            )
+            # If following RIGHT wall, turn LEFT to avoid forward obstacle (positive z)
+            # If following LEFT wall, turn RIGHT (negative z)
+            cmd.angular.z = (+self.max_angular_speed if self.follow_side == "right"
+                             else -self.max_angular_speed)
             self.cmd_pub.publish(cmd)
             return
 
-        #  PD wall following
+        # PD wall following
         error = self.wall_distance - side
         derivative = (error - self.last_error) / dt
         self.last_error = error
 
         angular_z = (self.kp * error) + (self.kd * derivative)
 
-        # Small corner help:
+        # Small corner help: if front-side is too close, add extra steer away
         if front_side < self.wall_distance:
-            angular_z += 0.3 if self.follow_side == "right" else -0.3
+            angular_z += (0.3 if self.follow_side == "right" else -0.3)
 
-        angular_z = clamp(angular_z, -self.max_angular_speed,
-                          self.max_angular_speed)
+        angular_z = clamp(angular_z, -self.max_angular_speed, self.max_angular_speed)
 
         cmd.linear.x = self.linear_speed
         cmd.angular.z = angular_z
@@ -190,7 +212,6 @@ class WallFollowerNode(Node):
         Return the minimum LiDAR distance within an angle window.
         Uses scan.angle_min and scan.angle_increment so it works for ANY lidar resolution.
         """
-        # Make explicit floats to satisfy stricter type checkers
         center = math.radians(float(center_deg))
         half = math.radians(float(half_width_deg))
 
@@ -231,8 +252,15 @@ def main() -> None:
     except KeyboardInterrupt:
         pass
     finally:
+        # IMPORTANT FIX:
+        # When launched via ros2 launch, Ctrl+C may shutdown ROS context before this runs.
+        # Publishing after shutdown causes: "publisher's context is invalid"
         stop = Twist()
-        node.cmd_pub.publish(stop)
+        try:
+            if rclpy.ok():
+                node.cmd_pub.publish(stop)
+        except Exception:
+            pass
         node.destroy_node()
         rclpy.shutdown()
 
