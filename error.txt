@@ -1,868 +1,241 @@
-            .-/+oossssoo+/-.
-        `:+ssssssssssssssssss+:`
-      -+ssssssssssssssssssyyssss+-
-    .ossssssssssssssssssdMMMNysssso.
-   /ssssssssssshdmmNNmmyNMMMMhssssss/
-  +ssssssssshmydMMMMMMMNddddyssssssss+
- /sssssssshNMMMyhhyyyyhmNMMMNhssssssss/    limo@ashlimo01 
-.ssssssssdMMMNhsssssssssshNMMMdssssssss.   -------------- 
-+sssshhhyNMMNyssssssssssssyNMMMysssssss+   OS: Ubuntu 22.04.5 LTS aarch64 
-ossyNMMMNyMMhsssssssssssssshmmmhssssssso   Host: NVIDIA Jetson Orin NX Engineering Reference Developer 
-ossyNMMMNyMMhsssssssssssssshmmmhssssssso   Kernel: 5.15.148-tegra 
-+sssshhhyNMMNyssssssssssssyNMMMysssssss+   Uptime: 1 hour, 36 mins 
-.ssssssssdMMMNhsssssssssshNMMMdssssssss.   Packages: 3272 (dpkg), 10 (snap) 
- /sssssssshNMMMyhhyyyyhdNMMMNhssssssss/    Shell: zsh 5.8.1 
-  +sssssssssdmydMMMMMMMMddddyssssssss+     Resolution: 1280x720 
-   /ssssssssssshdmNNNNmyNMMMMhssssss/      DE: GNOME 42.9 
-    .ossssssssssssssssssdMMMNysssso.       WM: Mutter 
-      -+sssssssssssssssssyyyssss+-         WM Theme: Adwaita 
-        `:+ssssssssssssssssss+:`           Theme: Yaru [GTK2/3] 
-            .-/+oossssoo+/-.               Icons: Yaru [GTK2/3] 
-                                           Terminal: vscode 
-                                           CPU: ARMv8 rev 1 (v8l) (6) @ 1.510GHz 
-                                           Memory: 2334MiB / 7619MiB 
-                                           Disk (/): 15G / 116G (14%) 
-                                           Local IP: 192.168.1.101 
+#!/usr/bin/env python3
+# File: wall_follower_node.py
+# Package: blazerbot_wall_follower
+# Node: wall_follower_node
+#
+# Purpose:
+#   ROS2 PD wall follower using LaserScan on 'scan' and publishing Twist on 'cmd_vel'.
+#   Works for differential-drive robots.
 
-                                                                   
-                                                                   
+import math
+import time
+from typing import Optional
+
+import rclpy
+from geometry_msgs.msg import Twist
+from rclpy.node import Node
+from sensor_msgs.msg import LaserScan
 
 
-[INFO] Current ROS2 workspace: ros2_ws
+def clamp(value: float, low: float, high: float) -> float:
+    """Limit 'value' so it never goes below low or above high."""
+    return max(low, min(value, high))
 
-limo_ros2 …
-➜ rd                                           
 
-development/ros/ros2_ws …
-➜ colcon build --packages-select blazerbot_bringup limo_bringup wall_follower limo_description
-Starting >>> wall_follower
-Starting >>> limo_description
-Starting >>> limo_bringup
-Finished <<< limo_bringup [1.46s]                                                             
-Finished <<< limo_description [1.52s]                                                     
-Finished <<< wall_follower [3.48s]          
-Starting >>> blazerbot_bringup
-Finished <<< blazerbot_bringup [1.46s]                  
+def sanitize_range(r: float, range_min: float, range_max: float) -> float:
+    """
+    Clean up LiDAR readings:
+      - inf / NaN / <= 0  -> treat as range_max (meaning 'no obstacle close')
+      - below range_min   -> range_min
+      - above range_max   -> range_max
+    """
+    if math.isinf(r) or math.isnan(r) or r <= 0.0:
+        return range_max
+    if r < range_min:
+        return range_min
+    if r > range_max:
+        return range_max
+    return r
 
-Summary: 4 packages finished [5.83s]
 
-development/ros/ros2_ws took 6.6s …
-➜ ros2 launch blazerbot_bringup robot_bringup.launch.py                                       
-[INFO] [launch]: All log files can be found below /home/limo/.ros/log/2026-02-26-03-27-49-026764-ashlimo01-120174
-[INFO] [launch]: Default logging verbosity is set to INFO
-[INFO] [limo_base-7]: process started with pid [120240]
-[INFO] [ydlidar_ros2_driver_node-8]: process started with pid [120261]
-[INFO] [wall_follower-9]: process started with pid [120271]
-[INFO] [robot_state_publisher-1]: process started with pid [120222]
-[INFO] [joint_state_publisher-2]: process started with pid [120224]
-[INFO] [static_transform_publisher-3]: process started with pid [120226]
-[INFO] [static_transform_publisher-4]: process started with pid [120228]
-[INFO] [static_transform_publisher-5]: process started with pid [120230]
-[INFO] [static_transform_publisher-6]: process started with pid [120232]
-[static_transform_publisher-3] [WARN] [1772076469.614346624] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-4] [WARN] [1772076469.614462304] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-5] [WARN] [1772076469.614595232] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-5] [INFO] [1772076469.768346208] [base_link_to_camera_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-5] translation: ('0.180000', '0.000000', '0.180000')
-[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-5] from 'base_link' to 'camera_link'
-[static_transform_publisher-6] [WARN] [1772076469.780145824] []: Old-style arguments are deprecated; see --help for new-style arguments
-[ydlidar_ros2_driver_node-8] [INFO] [1772076469.882851840] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Current ROS Driver Version: 1.0.1
-[ydlidar_ros2_driver_node-8] 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK initializing
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK has been initialized
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK Version: 1.2.7
-[static_transform_publisher-3] [INFO] [1772076469.922330688] [base_footprint_to_base_link_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.150000')
-[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-3] from 'base_footprint' to 'base_link'
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar successfully connected [/dev/ttyUSB0:230400]
-[static_transform_publisher-4] [INFO] [1772076470.051752992] [base_link_to_laser_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-4] translation: ('0.180000', '0.000000', '0.000000')
-[static_transform_publisher-4] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-4] from 'base_link' to 'laser_link'
-[limo_base-7] Loading parameters: 
-[limo_base-7] - port name: ttyTHS1
-[limo_base-7] - odom frame name: odom
-[limo_base-7] - base frame name: base_link
-[limo_base-7] - odom topic name: 1
-[limo_base-7] - use_mcnamu_: 0
-[limo_base-7] [INFO] [1772076470.096999232] [limo_base]: connet the serial port:'/dev/ttyTHS1'
-[limo_base-7] [INFO] [1772076470.097810784] [limo_base]: enableCommandedMode :
-[limo_base-7] [INFO] [1772076470.097863840] [limo_base]: Open the serial port:'/dev/ttyTHS1'
-[limo_base-7] [ERROR] [1772076470.111505280] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.131495136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.133141536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.158488544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.171604736] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.182324320] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.192682720] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.206581088] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.212708992] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.231600864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.233197696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.251635904] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.252863360] [limo_base]: Invalid frame! Check sum failed! 
-[static_transform_publisher-6] [INFO] [1772076470.267751232] [base_link_to_imu_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-6] translation: ('0.000000', '0.000000', '0.000000')
-[static_transform_publisher-6] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-6] from 'base_link' to 'imu_link'
-[limo_base-7] [ERROR] [1772076470.272133152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.291816704] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.301629984] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.311608800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.331687552] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.332934144] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.351712320] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.357872544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.371940832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.382591616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.402106272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.406733568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.408085184] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.413083936] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.423512192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.433792480] [limo_base]: Invalid frame! Check sum failed! 
-[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] [INFO] [1772076470.432647712] [robot_state_publisher]: got segment base_footprint
-[robot_state_publisher-1] [INFO] [1772076470.432957856] [robot_state_publisher]: got segment base_link
-[robot_state_publisher-1] [INFO] [1772076470.432987904] [robot_state_publisher]: got segment depth_camera_link
-[robot_state_publisher-1] [INFO] [1772076470.433000000] [robot_state_publisher]: got segment depth_link
-[robot_state_publisher-1] [INFO] [1772076470.433009376] [robot_state_publisher]: got segment front_left_wheel_link
-[robot_state_publisher-1] [INFO] [1772076470.433019008] [robot_state_publisher]: got segment front_right_wheel_link
-[robot_state_publisher-1] [INFO] [1772076470.433028256] [robot_state_publisher]: got segment imu_link
-[robot_state_publisher-1] [INFO] [1772076470.433036960] [robot_state_publisher]: got segment inertial_link
-[robot_state_publisher-1] [INFO] [1772076470.433045888] [robot_state_publisher]: got segment laser_link
-[robot_state_publisher-1] [INFO] [1772076470.433054624] [robot_state_publisher]: got segment rear_left_wheel_link
-[robot_state_publisher-1] [INFO] [1772076470.433063232] [robot_state_publisher]: got segment rear_right_wheel_link
-[limo_base-7] [ERROR] [1772076470.451829664] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.456795072] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.472437024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.481952544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.491896864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.502106560] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.510044032] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.521966496] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.532306368] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.552230528] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.571944896] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.582010496] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.592370080] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.612284000] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.642356288] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.653767264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.682179872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.710052832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.713230528] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.732912448] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.742422016] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.752878240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.772321824] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.783435136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.802938624] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.842159072] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.852551744] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.853327264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.872593600] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.892569696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.907284832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.922256480] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.934266336] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.953551968] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.960341024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.973488992] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076470.986609216] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.007373024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.013241152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.033876128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.052407712] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.057373056] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.083342400] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.092811584] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.107576512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.113604800] [limo_base]: Invalid frame! Check sum failed! 
-[wall_follower-9] [INFO] [1772076471.121919200] [wall_follower]: Initializing PID Wall Follower...
-[limo_base-7] [ERROR] [1772076471.132826880] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.142504128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.153617984] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.159470976] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.173280832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.183309088] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.195492800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.207549472] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.212482208] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.222622976] [limo_base]: Invalid frame! Check sum failed! 
-[wall_follower-9] [INFO] [1772076471.246610400] [wall_follower]: Press 's' to toggle, 'q' to quit.
-[wall_follower-9] [INFO] [1772076471.247977344] [wall_follower]: PID Wall Follower Ready.
-[wall_follower-9] Exception in thread Thread-1 (keyboard_listener):
-[wall_follower-9] Traceback (most recent call last):
-[wall_follower-9]   File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
-[wall_follower-9]     self.run()
-[wall_follower-9]   File "/usr/lib/python3.10/threading.py", line 953, in run
-[wall_follower-9]     self._target(*self._args, **self._kwargs)
-[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/build/wall_follower/wall_follower/scripts/wall_follower.py", line 121, in keyboard_listener
-[wall_follower-9]     old_settings = termios.tcgetattr(sys.stdin)
-[wall_follower-9] termios.error: (25, 'Inappropriate ioctl for device')
-[limo_base-7] [ERROR] [1772076471.253095712] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.272612384] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.282637600] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.293783424] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.313417824] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.332715904] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.334302848] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.353930944] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.372714304] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.382713568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.402778592] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.413652960] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.432803584] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.434333440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.452858176] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.454082368] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.473272736] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.483132096] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.493947360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.507835264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.512891840] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.514098368] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.532959712] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.552930528] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.557831808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.562840032] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.583639616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.593274272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.602897440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.607926272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.614096864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.633142240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.634386272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.653021664] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.673710912] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.693957824] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.708911328] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.713659296] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.734309920] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.753075520] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.753619840] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.763569088] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.774214240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.784273280] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.803116960] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.810208384] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.813918336] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.834373920] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.843150176] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.853201536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.854021536] [limo_base]: Invalid frame! Check sum failed! 
-[joint_state_publisher-2] [INFO] [1772076471.872162816] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
-[limo_base-7] [ERROR] [1772076471.873269152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.874333856] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.903179616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.909170592] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.923178016] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.954019712] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.959212960] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.974131584] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.984178080] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076471.994565152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.009397408] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.014062944] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.033315776] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.053349376] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.083873856] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.103776128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.110361536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.123774976] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.134284128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.163675360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.174269088] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.194917248] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.204772928] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.214913024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.253523552] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.254972576] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.274315648] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.314796032] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.334381984] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.384471488] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.404117920] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.410685312] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.424074112] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.434914240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.561940224] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Error, cannot retrieve YDLidar health code: fffffffe
-[limo_base-7] [ERROR] [1772076472.584657440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.595318080] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.608895488] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.614806528] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.633907488] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] Current Lidar Model Code 151
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Baseplate device info
-[ydlidar_ros2_driver_node-8] Firmware version: 1.2
-[ydlidar_ros2_driver_node-8] Hardware version: 1
-[ydlidar_ros2_driver_node-8] Model: Tmini Plus
-[ydlidar_ros2_driver_node-8] Serial: 2024092600090187
-[limo_base-7] [ERROR] [1772076472.674697632] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.694792960] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.762028544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.774793536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.784915616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.794420544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.809079872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.824474112] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.854982784] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.864526656] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.884929792] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.904544384] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.911292864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.954262304] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.962311872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076472.974612800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.004908640] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.024272864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.115233376] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.154857056] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.161402240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.185178496] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.204513568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.212541152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.214882400] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.285298240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.295771232] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.309612160] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.314931136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.325004192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.355051040] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.385034400] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.404644960] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.410634400] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.436652512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.459641792] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.495954656] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.510058816] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.516093440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.561794112] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.585274752] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.609832512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.615380608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.624868800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.694960544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.704966560] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.715247168] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.716518048] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.735202592] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.754969216] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.774986176] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.795944992] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.805690272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.856253440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.915113696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.916313440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.955683488] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.965777760] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.986063584] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076473.996406944] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.015613632] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.035273696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.055292640] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.065649504] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.076135616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.096510272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.111408800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.116157696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.136989216] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.155509664] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.160356192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.175469632] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.185480544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.205425024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.216669120] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.236670208] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.255658272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.266225568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.277406784] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.286464736] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.296885568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.316328544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.335743808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.335941216] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.345605696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.356737312] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.362559552] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.375593216] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.376874816] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.405653376] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.410946688] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.425592992] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.465728544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.556779264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.566147808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.605819872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.613844608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.616579840] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.636682464] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.637080256] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.646241600] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.660852704] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.675878816] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.685860416] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.695899232] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.697249600] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.714233344] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.716699584] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.766376032] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.776415104] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.797288704] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.811310112] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.826656832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.846473344] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.863063360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.916126240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.917423392] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.946557888] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.962246624] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076474.966783520] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.014190624] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.036670304] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.046364608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.066710624] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.077037664] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.117086304] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.146329760] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.276820128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.297745568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.326881824] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 5479 ms
-[limo_base-7] [ERROR] [1772076475.366941536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.376903168] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.406582240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.437803072] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.438239008] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.456684096] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.461627872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.511644832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.563747104] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.577287488] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.597522752] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.612877568] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.626798336] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.637995328] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.663855424] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.667275200] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.677289600] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.686863936] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.698103136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.707301440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.712886016] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.737737056] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.747340192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.797353312] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.798120864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.812292192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.817030048] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.818258848] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.837762176] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.847354976] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.858278304] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.877826592] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.898240608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.915132000] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.927720928] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.938778880] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.947547872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.977622784] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076475.998003904] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.012273408] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.027396640] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.037981408] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.047593056] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.062395520] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.077236512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.097273280] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.147304672] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.167713280] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.188221952] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.258195808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.264421088] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.297431456] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.298213152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.313446784] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.358290368] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.363570784] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.387926560] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.399815552] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.414591008] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.418354240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.447953888] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.458351808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.463639392] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.487677056] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.558076608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.562683264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.578099648] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.587764544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.664780128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.667849696] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.688245312] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.718709920] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.739069120] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.762887968] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.813273856] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.818763744] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.867960288] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.908084192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.928692832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.940107072] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.958068288] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076476.958896224] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0xB1B088E0
-[limo_base-7] [ERROR] [1772076476.963110784] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.008778272] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.018146016] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.039358144] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.058574464] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.063168512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.079178912] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.088503872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.108389248] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:57][error] Check Sum 0x47ED != 0x0C9D
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:57][error] Check Sum 0xBEAE != 0x4A66
-[limo_base-7] [ERROR] [1772076477.178378208] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.188355808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.189177920] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.199085888] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.219637984] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.266381120] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.278413408] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.289303872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.299190528] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.313399104] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.358488416] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.359610720] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.368468544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.398526752] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.413526048] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.418524608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.418901792] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.440536576] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2098 ms
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Scan Frequency: 10.00Hz
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Fixed Size: 400
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Sample Rate: 4.00K
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to check the lidar, Elapsed time 0 ms
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:57][info] [YDLIDAR] Now lidar is scanning...
-[limo_base-7] [ERROR] [1772076477.489970848] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.513652448] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.519403456] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.559831104] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.566662592] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.613714496] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.615719872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.639245376] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.665749984] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.708820800] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.759252832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.769273536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.779327936] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.789309408] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.798928704] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.815899616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.849332192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.908946720] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.919026432] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.920500896] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.959479360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.969711808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.989874400] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076477.999974944] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.019499360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.029111872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.040804736] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.059972096] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.079914368] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.100215360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.114166304] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x4A7F != 0x6550
-[limo_base-7] [ERROR] [1772076478.140830496] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.149611616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.160555360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.169715776] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.181915808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.190062336] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.199704896] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0xBF9E != 0x82A1
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x10A9 != 0x4A02
-[limo_base-7] [ERROR] [1772076478.269971744] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x528D != 0x98D0
-[limo_base-7] [ERROR] [1772076478.300156768] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x1A75 != 0x552F
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x5394 != 0x0BAD
-[limo_base-7] [ERROR] [1772076478.369845632] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.400625728] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0xD30D != 0x2B9D
-[limo_base-7] [ERROR] [1772076478.419460288] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.420715648] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.439967744] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.449585024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.459919296] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.480740608] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x8AB0 != 0x300C
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0xF611 != 0x4BAA
-[limo_base-7] [ERROR] [1772076478.569641280] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.600424480] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.620135616] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.649721856] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.660958336] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x9CB4 != 0xE773
-[limo_base-7] [ERROR] [1772076478.690553824] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.717882240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.730438336] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.749840064] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.761054880] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x4B36 != 0x5A8A
-[limo_base-7] [ERROR] [1772076478.779870720] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.780945888] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.820241728] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x90E9 != 0x0382
-[limo_base-7] [ERROR] [1772076478.830631360] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0xEF03 != 0x39C6
-[limo_base-7] [ERROR] [1772076478.865265088] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.879916768] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.889998336] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0xF37D != 0xDE14
-[limo_base-7] [ERROR] [1772076478.920361120] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.930405600] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.960855552] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.965994080] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.970413440] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:58][error] Check Sum 0x97FB != 0x562E
-[limo_base-7] [ERROR] [1772076478.980798528] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076478.990455328] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.000966304] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x4315 != 0x9B61
-[limo_base-7] [ERROR] [1772076479.020871232] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.030908096] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.040930912] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.060175712] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.060987360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.080137152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.080658656] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.081490048] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0xB916 != 0x72E6
-[limo_base-7] [ERROR] [1772076479.150570816] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0xF468 != 0x2DD5
-[limo_base-7] [ERROR] [1772076479.217304768] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.220260704] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0xA33C != 0x9E46
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x1048 != 0x8428
-[limo_base-7] [ERROR] [1772076479.250295200] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x266E != 0x6CF6
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x2F50 != 0x2908
-[limo_base-7] [ERROR] [1772076479.316382656] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.321181664] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x72A1 != 0xD6A0
-[limo_base-7] [ERROR] [1772076479.340760512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.341828320] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.360399648] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.361160704] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x8584 != 0x9E22
-[limo_base-7] [ERROR] [1772076479.370396896] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.400447808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.401209792] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.410814656] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.416098208] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.420826496] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.440872192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.461278144] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.465564768] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.480963328] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x0B89 != 0x209B
-[limo_base-7] [ERROR] [1772076479.490920352] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.517700256] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x169B != 0x7422
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x57DF != 0x0C73
-[limo_base-7] [ERROR] [1772076479.571227872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.581980128] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.600672992] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.601786176] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.651074688] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.680752864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.690723744] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.701561152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.741540864] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.768933760] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.817851616] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x632C != 0x5627
-[limo_base-7] [ERROR] [1772076479.901023680] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.902162912] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x7300 != 0x6DAE
-[limo_base-7] [ERROR] [1772076479.912080896] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.922220832] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.940984768] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:27:59][error] Check Sum 0x7FE4 != 0xF876
-[limo_base-7] [ERROR] [1772076479.967102944] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.971411808] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.981853440] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076479.991092032] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.001819584] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.022261152] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.061840320] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:00][error] Check Sum 0xF4DE != 0x2514
-[limo_base-7] [ERROR] [1772076480.071467936] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.082020000] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.091917728] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.102354336] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.116317216] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.122390720] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.142388544] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.191254976] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.201598464] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.211268384] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.222394624] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:00][error] Check Sum 0xE970 != 0x77AC
-[limo_base-7] [ERROR] [1772076480.241270592] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.242428256] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.271619072] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.282046816] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.311738336] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.321714592] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:00][error] Check Sum 0x3BE5 != 0x1944
-[limo_base-7] [ERROR] [1772076480.342956256] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.381473472] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.392397760] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.402457536] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.416751040] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.422213760] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.431822656] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.442359968] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.451447424] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.462637728] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.468490144] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.491846400] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.502345280] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.516826752] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.571524768] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.572193408] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.582451264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.617777984] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.668714112] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.692061664] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.702882624] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.712220352] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:00][error] Check Sum 0xAEA8 != 0x7482
-[limo_base-7] [ERROR] [1772076480.722571136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.742130624] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.742922240] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.761774304] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.766839360] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.791813120] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:00][error] Check Sum 0x0F40 != 0x41B0
-[limo_base-7] [ERROR] [1772076480.863082912] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.881839264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.916858560] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.941939904] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.951944608] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.963128384] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.967215520] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.971955712] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076480.983228544] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0x6B05 != 0x4B96
-[limo_base-7] [ERROR] [1772076481.023031872] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0x2884 != 0x5D55
-[limo_base-7] [ERROR] [1772076481.042835488] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.062202208] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.067189216] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.076141120] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.092918912] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.103259872] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.182547424] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.220233888] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.303056928] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.320327136] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.332941184] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0xD626 != 0x5290
-[limo_base-7] [ERROR] [1772076481.402397344] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.412538144] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.419443264] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.432764832] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0x0AD2 != 0xF8EF
-[limo_base-7] [ERROR] [1772076481.444246656] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.462437184] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0xDA88 != 0x6FDF
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0x766E != 0x7584
-[limo_base-7] [ERROR] [1772076481.517460128] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0x5E70 != 0x933D
-[limo_base-7] [ERROR] [1772076481.563387936] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.569529024] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.582564064] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0xE9B4 != 0x76D3
-[limo_base-7] [ERROR] [1772076481.593335392] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.603357216] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0x3D54 != 0x8562
-[limo_base-7] [ERROR] [1772076481.642598720] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0x121E != 0x4809
-[limo_base-7] [ERROR] [1772076481.662671328] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.670731488] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.682640512] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.692643072] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.702669120] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0xB578 != 0x2286
-[limo_base-7] [ERROR] [1772076481.719714816] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0xC95D != 0x098F
-[limo_base-7] [ERROR] [1772076481.803552160] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0xC6D8 != 0x4398
-[limo_base-7] [ERROR] [1772076481.820798720] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0xAB42 != 0x8F2D
-[limo_base-7] [ERROR] [1772076481.842822944] [limo_base]: Invalid frame! Check sum failed! 
-[ydlidar_ros2_driver_node-8] [2026-02-26 03:28:01][error] Check Sum 0x549C != 0xD9D5
-[limo_base-7] [ERROR] [1772076481.853172896] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.868866176] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [ERROR] [1772076481.884227968] [limo_base]: Invalid frame! Check sum failed! 
-^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
-[limo_base-7] [ERROR] [1772076481.903676192] [limo_base]: Invalid frame! Check sum failed! 
-[limo_base-7] [INFO] [1772076481.903923424] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-3] [INFO] [1772076481.904036512] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[INFO] [static_transform_publisher-6]: process has finished cleanly [pid 120232]
-[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 120226]
-[INFO] [static_transform_publisher-5]: process has finished cleanly [pid 120230]
-[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 120222]
-[INFO] [static_transform_publisher-4]: process has finished cleanly [pid 120228]
-[ERROR] [limo_base-7]: process has died [pid 120240, exit code -6, cmd '/home/limo/development/ros/ros2_ws/install/limo_base/lib/limo_base/limo_base --ros-args --params-file /tmp/launch_params_wncuynbw'].
-[INFO] [joint_state_publisher-2]: process has finished cleanly [pid 120224]
-[ERROR] [wall_follower-9]: process has died [pid 120271, exit code 1, cmd '/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower --ros-args -r __node:=wall_follower'].
-[robot_state_publisher-1] [INFO] [1772076481.904319616] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[ydlidar_ros2_driver_node-8] [INFO] [1772076481.904964448] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-4] [INFO] [1772076481.905813984] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-6] [INFO] [1772076481.906655168] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[limo_base-7] terminate called without an active exception
-[static_transform_publisher-5] [INFO] [1772076481.908436352] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[ydlidar_ros2_driver_node-8] [INFO] [1772076481.934915296] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Now YDLIDAR is stopping .......
-[wall_follower-9] Traceback (most recent call last):
-[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower", line 33, in <module>
-[wall_follower-9]     sys.exit(load_entry_point('wall-follower==0.0.0', 'console_scripts', 'wall_follower')())
-[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/build/wall_follower/wall_follower/scripts/wall_follower.py", line 276, in main
-[wall_follower-9]     node.stop_robot()
-[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/build/wall_follower/wall_follower/scripts/wall_follower.py", line 260, in stop_robot
-[wall_follower-9]     self.cmd_vel_pub.publish(self.twist_cmd)
-[wall_follower-9]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/publisher.py", line 70, in publish
-[wall_follower-9]     self.__publisher.publish(msg)
-[wall_follower-9] rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:389
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Now lidar scanning has stopped!
-[INFO] [ydlidar_ros2_driver_node-8]: process has finished cleanly [pid 120261]
+class WallFollowerNode(Node):
+    def __init__(self) -> None:
+        super().__init__("wall_follower_node")
 
-development/ros/ros2_ws took 15.1s …
-➜ 
+        #  Parameters
+        # Wall-following goal
+        self.declare_parameter("wall_distance", 0.5)      # meters
+        self.declare_parameter("safety_distance", 0.35)   # meters
+        self.declare_parameter("linear_speed", 0.25)      # m/s
 
-develo
+        # PD gains
+        self.declare_parameter("kp", 1.2)
+        self.declare_parameter("kd", 0.15)
+
+        # Safety + limits
+        self.declare_parameter("max_angular_speed", 1.2)  # rad/s
+        self.declare_parameter("follow_side", "right")    # "right" or "left"
+
+        # Angle windows for sampling scan (degrees)
+        self.declare_parameter("front_deg", 0.0)
+        self.declare_parameter("front_right_deg", -45.0)
+        self.declare_parameter("right_deg", -90.0)
+        self.declare_parameter("window_half_width_deg", 10.0)
+
+        # Type-safe parameter getters
+        # These remove the "Unknown | None" static type error from editors.
+        def get_param_float(name: str) -> float:
+            value = self.get_parameter(name).value
+            if value is None:
+                raise ValueError(f"Parameter '{name}' is None")
+            return float(value)
+
+        def get_param_str(name: str) -> str:
+            value = self.get_parameter(name).value
+            if value is None:
+                raise ValueError(f"Parameter '{name}' is None")
+            return str(value)
+
+        # Read parameters (type-safe)
+        self.wall_distance = get_param_float("wall_distance")
+        self.safety_distance = get_param_float("safety_distance")
+        self.linear_speed = get_param_float("linear_speed")
+
+        self.kp = get_param_float("kp")
+        self.kd = get_param_float("kd")
+
+        self.max_angular_speed = get_param_float("max_angular_speed")
+        self.follow_side = get_param_str("follow_side").lower().strip()
+
+        self.front_deg = get_param_float("front_deg")
+        self.front_right_deg = get_param_float("front_right_deg")
+        self.right_deg = get_param_float("right_deg")
+        self.window_half_width_deg = get_param_float("window_half_width_deg")
+
+        # Validate follow_side
+        if self.follow_side not in ("right", "left"):
+            self.get_logger().warn(
+                "follow_side must be 'right' or 'left'. Defaulting to 'right'."
+            )
+            self.follow_side = "right"
+
+        # If following LEFT wall, mirror the right-side angles
+        if self.follow_side == "left":
+            self.front_right_deg = +abs(self.front_right_deg)
+            self.right_deg = +abs(self.right_deg)
+
+        # ROS interfaces
+        self.scan_sub = self.create_subscription(
+            LaserScan, "scan", self.scan_callback, 10
+        )
+        self.cmd_pub = self.create_publisher(Twist, "cmd_vel", 10)
+
+        #  Controller state
+        self.latest_scan: Optional[LaserScan] = None
+        self.last_error: float = 0.0
+        self.last_time: Optional[float] = None
+
+        # Run control loop at 10 Hz (every 0.1 s)
+        self.timer = self.create_timer(0.1, self.control_loop)
+
+        self.get_logger().info(
+            f"WallFollowerNode started. side={self.follow_side}, wall_distance={self.wall_distance}, "
+            f"kp={self.kp}, kd={self.kd}"
+        )
+
+    def scan_callback(self, msg: LaserScan) -> None:
+        """Store the latest scan so the timer loop can use it."""
+        self.latest_scan = msg
+
+    def control_loop(self) -> None:
+        """
+        Main loop:
+          1) Read distances from scan (front, front-right, right/left)
+          2) If front obstacle too close -> stop + turn away (safety)
+          3) Else PD control to keep desired wall distance
+          4) Publish cmd_vel
+        """
+        if self.latest_scan is None:
+            return  # don’t drive until scan exists
+
+        scan = self.latest_scan
+
+        # Read key distances using angle windows
+        front = self.get_min_range_in_window(
+            scan, self.front_deg, self.window_half_width_deg)
+        side = self.get_min_range_in_window(
+            scan, self.right_deg, self.window_half_width_deg)
+        front_side = self.get_min_range_in_window(
+            scan, self.front_right_deg, self.window_half_width_deg)
+
+        # Compute dt for derivative term
+        now = time.time()
+        if self.last_time is None:
+            dt = 0.1
+        else:
+            dt = max(1e-3, now - self.last_time)
+        self.last_time = now
+
+        cmd = Twist()
+
+        if front < self.safety_distance:
+            cmd.linear.x = 0.0
+            cmd.angular.z = (
+                +self.max_angular_speed if self.follow_side == "right" else -self.max_angular_speed
+            )
+            self.cmd_pub.publish(cmd)
+            return
+
+        #  PD wall following
+        error = self.wall_distance - side
+        derivative = (error - self.last_error) / dt
+        self.last_error = error
+
+        angular_z = (self.kp * error) + (self.kd * derivative)
+
+        # Small corner help:
+        if front_side < self.wall_distance:
+            angular_z += 0.3 if self.follow_side == "right" else -0.3
+
+        angular_z = clamp(angular_z, -self.max_angular_speed,
+                          self.max_angular_speed)
+
+        cmd.linear.x = self.linear_speed
+        cmd.angular.z = angular_z
+
+        self.cmd_pub.publish(cmd)
+
+    def get_min_range_in_window(self, scan: LaserScan, center_deg: float, half_width_deg: float) -> float:
+        """
+        Return the minimum LiDAR distance within an angle window.
+        Uses scan.angle_min and scan.angle_increment so it works for ANY lidar resolution.
+        """
+        # Make explicit floats to satisfy stricter type checkers
+        center = math.radians(float(center_deg))
+        half = math.radians(float(half_width_deg))
+
+        start_angle = center - half
+        end_angle = center + half
+
+        # Guard: avoid divide-by-zero if scan is malformed
+        if scan.angle_increment == 0.0:
+            return scan.range_max
+
+        start_i = int((start_angle - scan.angle_min) / scan.angle_increment)
+        end_i = int((end_angle - scan.angle_min) / scan.angle_increment)
+
+        n = len(scan.ranges)
+        if n == 0:
+            return scan.range_max
+
+        start_i = max(0, min(start_i, n - 1))
+        end_i = max(0, min(end_i, n - 1))
+
+        if start_i > end_i:
+            start_i, end_i = end_i, start_i
+
+        min_val = scan.range_max
+        for i in range(start_i, end_i + 1):
+            r = sanitize_range(scan.ranges[i], scan.range_min, scan.range_max)
+            if r < min_val:
+                min_val = r
+
+        return min_val
+
+
+def main() -> None:
+    rclpy.init()
+    node = WallFollowerNode()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        stop = Twist()
+        node.cmd_pub.publish(stop)
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()
