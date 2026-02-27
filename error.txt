@@ -1,241 +1,111 @@
-#!/usr/bin/env python3
-# File: wall_follower_node.py
-# Package: blazerbot_wall_follower
-# Node: wall_follower_node
-#
-# Purpose:
-#   ROS2 PD wall follower using LaserScan on 'scan' and publishing Twist on 'cmd_vel'.
-#   Works for differential-drive robots.
+publisher-5]: process started with pid [13731]
+[INFO] [static_transform_publisher-6]: process started with pid [13733]
+[static_transform_publisher-4] [WARN] [1772150720.043280892] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-6] [WARN] [1772150720.043135276] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-3] [WARN] [1772150720.071770377] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-5] [WARN] [1772150720.081608766] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-4] [INFO] [1772150720.147479407] [base_link_to_laser_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-4] translation: ('0.180000', '0.000000', '0.000000')
+[static_transform_publisher-4] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-4] from 'base_link' to 'laser_link'
+[static_transform_publisher-6] [INFO] [1772150720.179505160] [base_link_to_imu_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-6] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-6] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-6] from 'base_link' to 'imu_link'
+[static_transform_publisher-5] [INFO] [1772150720.186513927] [base_link_to_camera_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-5] translation: ('0.180000', '0.000000', '0.180000')
+[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-5] from 'base_link' to 'camera_link'
+[ydlidar_ros2_driver_node-8] [INFO] [1772150720.187681740] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Current ROS Driver Version: 1.0.1
+[ydlidar_ros2_driver_node-8] 
+[static_transform_publisher-3] [INFO] [1772150720.203044477] [base_footprint_to_base_link_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.150000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'base_footprint' to 'base_link'
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK initializing
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK has been initialized
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK Version: 1.2.7
+[limo_base-7] Loading parameters: 
+[limo_base-7] - port name: ttyTHS1
+[limo_base-7] - odom frame name: odom
+[limo_base-7] - base frame name: base_link
+[limo_base-7] - odom topic name: 1
+[limo_base-7] - use_mcnamu_: 0
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] [INFO] [1772150720.236327057] [robot_state_publisher]: got segment base_footprint
+[robot_state_publisher-1] [INFO] [1772150720.236702505] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-1] [INFO] [1772150720.236729414] [robot_state_publisher]: got segment depth_camera_link
+[robot_state_publisher-1] [INFO] [1772150720.236741189] [robot_state_publisher]: got segment depth_link
+[robot_state_publisher-1] [INFO] [1772150720.236751044] [robot_state_publisher]: got segment front_left_wheel_link
+[robot_state_publisher-1] [INFO] [1772150720.236760611] [robot_state_publisher]: got segment front_right_wheel_link
+[robot_state_publisher-1] [INFO] [1772150720.236769506] [robot_state_publisher]: got segment imu_link
+[robot_state_publisher-1] [INFO] [1772150720.236778337] [robot_state_publisher]: got segment inertial_link
+[robot_state_publisher-1] [INFO] [1772150720.236787136] [robot_state_publisher]: got segment laser_link
+[robot_state_publisher-1] [INFO] [1772150720.236795520] [robot_state_publisher]: got segment rear_left_wheel_link
+[robot_state_publisher-1] [INFO] [1772150720.236804607] [robot_state_publisher]: got segment rear_right_wheel_link
+[limo_base-7] [INFO] [1772150720.251935208] [limo_base]: connet the serial port:'/dev/ttyTHS1'
+[limo_base-7] [INFO] [1772150720.258162777] [limo_base]: enableCommandedMode :
+[limo_base-7] [INFO] [1772150720.258288299] [limo_base]: Open the serial port:'/dev/ttyTHS1'
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar successfully connected [/dev/ttyUSB0:230400]
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar running correctly! The health status: good
+[joint_state_publisher-2] [INFO] [1772150720.919004103] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
+[wall_follower-9] [INFO] [1772150720.992353478] [wall_follower]: WallFollowerNode started. side=right, wall_distance=0.5, kp=1.2, kd=0.15
+[ydlidar_ros2_driver_node-8] Current Lidar Model Code 151
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Baseplate device info
+[ydlidar_ros2_driver_node-8] Firmware version: 1.2
+[ydlidar_ros2_driver_node-8] Hardware version: 1
+[ydlidar_ros2_driver_node-8] Model: Tmini Plus
+[ydlidar_ros2_driver_node-8] Serial: 2024092600090187
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 995 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0xA5DB98E0
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2097 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Scan Frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Fixed Size: 400
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Sample Rate: 4.00K
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to check the lidar, Elapsed time 0 ms
+[ydlidar_ros2_driver_node-8] [2026-02-27 00:05:23][info] [YDLIDAR] Now lidar is scanning...
+[wall_follower-9] [WARN] [1772150723.313261898] [wall_follower]: New publisher discovered on topic 'scan', offering incompatible QoS. No messages will be received from it. Last incompatible policy: RELIABILITY
+[ydlidar_ros2_driver_node-8] [WARN] [1772150723.359972847] [ydlidar_ros2_driver_node]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[limo_base-7] [INFO] [1772150742.045326785] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [static_transform_publisher-5]: process has finished cleanly [pid 13731]
+[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 13727]
+[INFO] [static_transform_publisher-6]: process has finished cleanly [pid 13733]
+[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 13723]
+[INFO] [static_transform_publisher-4]: process has finished cleanly [pid 13729]
+[ERROR] [limo_base-7]: process has died [pid 13735, exit code -6, cmd '/home/limo/development/ros/ros2_ws/install/limo_base/lib/limo_base/limo_base --ros-args --params-file /tmp/launch_params_d6bzs04a'].
+[INFO] [joint_state_publisher-2]: process has finished cleanly [pid 13725]
+[ERROR] [wall_follower-9]: process has died [pid 13739, exit code 1, cmd '/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower --ros-args -r __node:=wall_follower'].
+[robot_state_publisher-1] [INFO] [1772150742.045327553] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-4] [INFO] [1772150742.045395727] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-3] [INFO] [1772150742.045502515] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ydlidar_ros2_driver_node-8] [INFO] [1772150742.047050488] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ydlidar_ros2_driver_node-8] [INFO] [1772150742.085284428] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Now YDLIDAR is stopping .......
+[static_transform_publisher-6] [INFO] [1772150742.046253387] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-5] [INFO] [1772150742.047204143] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[limo_base-7] terminate called without an active exception
+[wall_follower-9] Traceback (most recent call last):
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower", line 33, in <module>
+[wall_follower-9]     sys.exit(load_entry_point('wall-follower==0.0.0', 'console_scripts', 'wall_follower')())
+[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/python3.10/site-packages/wall_follower/scripts/wall_follower.py", line 235, in main
+[wall_follower-9]     node.cmd_pub.publish(stop)
+[wall_follower-9]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/publisher.py", line 70, in publish
+[wall_follower-9]     self.__publisher.publish(msg)
+[wall_follower-9] rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Now lidar scanning has stopped!
+[INFO] [ydlidar_ros2_driver_node-8]: process has finished cleanly [pid 13737]
 
-import math
-import time
-from typing import Optional
-
-import rclpy
-from geometry_msgs.msg import Twist
-from rclpy.node import Node
-from sensor_msgs.msg import LaserScan
-
-
-def clamp(value: float, low: float, high: float) -> float:
-    """Limit 'value' so it never goes below low or above high."""
-    return max(low, min(value, high))
-
-
-def sanitize_range(r: float, range_min: float, range_max: float) -> float:
-    """
-    Clean up LiDAR readings:
-      - inf / NaN / <= 0  -> treat as range_max (meaning 'no obstacle close')
-      - below range_min   -> range_min
-      - above range_max   -> range_max
-    """
-    if math.isinf(r) or math.isnan(r) or r <= 0.0:
-        return range_max
-    if r < range_min:
-        return range_min
-    if r > range_max:
-        return range_max
-    return r
-
-
-class WallFollowerNode(Node):
-    def __init__(self) -> None:
-        super().__init__("wall_follower_node")
-
-        #  Parameters
-        # Wall-following goal
-        self.declare_parameter("wall_distance", 0.5)      # meters
-        self.declare_parameter("safety_distance", 0.35)   # meters
-        self.declare_parameter("linear_speed", 0.25)      # m/s
-
-        # PD gains
-        self.declare_parameter("kp", 1.2)
-        self.declare_parameter("kd", 0.15)
-
-        # Safety + limits
-        self.declare_parameter("max_angular_speed", 1.2)  # rad/s
-        self.declare_parameter("follow_side", "right")    # "right" or "left"
-
-        # Angle windows for sampling scan (degrees)
-        self.declare_parameter("front_deg", 0.0)
-        self.declare_parameter("front_right_deg", -45.0)
-        self.declare_parameter("right_deg", -90.0)
-        self.declare_parameter("window_half_width_deg", 10.0)
-
-        # Type-safe parameter getters
-        # These remove the "Unknown | None" static type error from editors.
-        def get_param_float(name: str) -> float:
-            value = self.get_parameter(name).value
-            if value is None:
-                raise ValueError(f"Parameter '{name}' is None")
-            return float(value)
-
-        def get_param_str(name: str) -> str:
-            value = self.get_parameter(name).value
-            if value is None:
-                raise ValueError(f"Parameter '{name}' is None")
-            return str(value)
-
-        # Read parameters (type-safe)
-        self.wall_distance = get_param_float("wall_distance")
-        self.safety_distance = get_param_float("safety_distance")
-        self.linear_speed = get_param_float("linear_speed")
-
-        self.kp = get_param_float("kp")
-        self.kd = get_param_float("kd")
-
-        self.max_angular_speed = get_param_float("max_angular_speed")
-        self.follow_side = get_param_str("follow_side").lower().strip()
-
-        self.front_deg = get_param_float("front_deg")
-        self.front_right_deg = get_param_float("front_right_deg")
-        self.right_deg = get_param_float("right_deg")
-        self.window_half_width_deg = get_param_float("window_half_width_deg")
-
-        # Validate follow_side
-        if self.follow_side not in ("right", "left"):
-            self.get_logger().warn(
-                "follow_side must be 'right' or 'left'. Defaulting to 'right'."
-            )
-            self.follow_side = "right"
-
-        # If following LEFT wall, mirror the right-side angles
-        if self.follow_side == "left":
-            self.front_right_deg = +abs(self.front_right_deg)
-            self.right_deg = +abs(self.right_deg)
-
-        # ROS interfaces
-        self.scan_sub = self.create_subscription(
-            LaserScan, "scan", self.scan_callback, 10
-        )
-        self.cmd_pub = self.create_publisher(Twist, "cmd_vel", 10)
-
-        #  Controller state
-        self.latest_scan: Optional[LaserScan] = None
-        self.last_error: float = 0.0
-        self.last_time: Optional[float] = None
-
-        # Run control loop at 10 Hz (every 0.1 s)
-        self.timer = self.create_timer(0.1, self.control_loop)
-
-        self.get_logger().info(
-            f"WallFollowerNode started. side={self.follow_side}, wall_distance={self.wall_distance}, "
-            f"kp={self.kp}, kd={self.kd}"
-        )
-
-    def scan_callback(self, msg: LaserScan) -> None:
-        """Store the latest scan so the timer loop can use it."""
-        self.latest_scan = msg
-
-    def control_loop(self) -> None:
-        """
-        Main loop:
-          1) Read distances from scan (front, front-right, right/left)
-          2) If front obstacle too close -> stop + turn away (safety)
-          3) Else PD control to keep desired wall distance
-          4) Publish cmd_vel
-        """
-        if self.latest_scan is None:
-            return  # don’t drive until scan exists
-
-        scan = self.latest_scan
-
-        # Read key distances using angle windows
-        front = self.get_min_range_in_window(
-            scan, self.front_deg, self.window_half_width_deg)
-        side = self.get_min_range_in_window(
-            scan, self.right_deg, self.window_half_width_deg)
-        front_side = self.get_min_range_in_window(
-            scan, self.front_right_deg, self.window_half_width_deg)
-
-        # Compute dt for derivative term
-        now = time.time()
-        if self.last_time is None:
-            dt = 0.1
-        else:
-            dt = max(1e-3, now - self.last_time)
-        self.last_time = now
-
-        cmd = Twist()
-
-        if front < self.safety_distance:
-            cmd.linear.x = 0.0
-            cmd.angular.z = (
-                +self.max_angular_speed if self.follow_side == "right" else -self.max_angular_speed
-            )
-            self.cmd_pub.publish(cmd)
-            return
-
-        #  PD wall following
-        error = self.wall_distance - side
-        derivative = (error - self.last_error) / dt
-        self.last_error = error
-
-        angular_z = (self.kp * error) + (self.kd * derivative)
-
-        # Small corner help:
-        if front_side < self.wall_distance:
-            angular_z += 0.3 if self.follow_side == "right" else -0.3
-
-        angular_z = clamp(angular_z, -self.max_angular_speed,
-                          self.max_angular_speed)
-
-        cmd.linear.x = self.linear_speed
-        cmd.angular.z = angular_z
-
-        self.cmd_pub.publish(cmd)
-
-    def get_min_range_in_window(self, scan: LaserScan, center_deg: float, half_width_deg: float) -> float:
-        """
-        Return the minimum LiDAR distance within an angle window.
-        Uses scan.angle_min and scan.angle_increment so it works for ANY lidar resolution.
-        """
-        # Make explicit floats to satisfy stricter type checkers
-        center = math.radians(float(center_deg))
-        half = math.radians(float(half_width_deg))
-
-        start_angle = center - half
-        end_angle = center + half
-
-        # Guard: avoid divide-by-zero if scan is malformed
-        if scan.angle_increment == 0.0:
-            return scan.range_max
-
-        start_i = int((start_angle - scan.angle_min) / scan.angle_increment)
-        end_i = int((end_angle - scan.angle_min) / scan.angle_increment)
-
-        n = len(scan.ranges)
-        if n == 0:
-            return scan.range_max
-
-        start_i = max(0, min(start_i, n - 1))
-        end_i = max(0, min(end_i, n - 1))
-
-        if start_i > end_i:
-            start_i, end_i = end_i, start_i
-
-        min_val = scan.range_max
-        for i in range(start_i, end_i + 1):
-            r = sanitize_range(scan.ranges[i], scan.range_min, scan.range_max)
-            if r < min_val:
-                min_val = r
-
-        return min_val
-
-
-def main() -> None:
-    rclpy.init()
-    node = WallFollowerNode()
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        stop = Twist()
-        node.cmd_pub.publish(stop)
-        node.destroy_node()
-        rclpy.shutdown()
-
-
-if __name__ == "__main__":
-    main()
+development/ros/ros2_ws took 24.9s …
