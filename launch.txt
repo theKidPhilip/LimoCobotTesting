@@ -1,15 +1,34 @@
-development/ros/ros2_ws …
-➜ ros2 service call /slam_toolbox/dynamic_map nav_msgs/srv/GetMap {}                           
-requester: making request: nav_msgs.srv.GetMap_Request()
+import os
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch_ros.actions import Node
 
-response:
-nav_msgs.srv.GetMap_Response(map=nav_msgs.msg.OccupancyGrid(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=0, nanosec=0), frame_id=''), info=nav_msgs.msg.MapMetaData(map_load_time=builtin_interfaces.msg.Time(sec=0, nanosec=0), resolution=0.0, width=0, height=0, origin=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=0.0, y=0.0, z=0.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), data=[]))
+def generate_launch_description():
+
+    limo_bringup_dir = get_package_share_directory('limo_bringup')
+    slam_params_file = os.path.join(limo_bringup_dir, 'config_files', 'slam_box.yaml')
+
+    slam_toolbox_node = Node(
+        package="slam_toolbox",
+        executable="async_slam_toolbox_node",
+        name='slam_toolbox',
+        output='screen',
+        parameters=[
+            slam_params_file,
+            {'use_sim_time': False}  # Fixed: was True, must be False for physical robot
+        ]
+    )
+
+    return LaunchDescription([
+        slam_toolbox_node
+    ])
 
 
-development/ros/ros2_ws …
-➜ ros2 topic echo /map_updates --once
-WARNING: topic [/map_updates] does not appear to be published yet
-Could not determine the type for the passed topic
 
-development/ros/ros2_ws …
-➜ 
+
+    minimum_travel_distance: 0.1
+    minimum_travel_heading: 0.1
+    minimum_time_interval: 0.1
+    transform_timeout: 1.0
+    tf_buffer_duration: 60.0
+    max_laser_range: 12.0
