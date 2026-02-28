@@ -42,13 +42,10 @@ def launch_setup(context):
     # MODE 1: Mapping — build a new map
     # ─────────────────────────────────────────────
     if mode == "mapping":
+
         slam_launch = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
-                os.path.join(
-                    get_package_share_directory("slam_toolbox"),
-                    "launch",
-                    "online_async_launch.py",
-                )
+                "/opt/ros/humble/share/slam_toolbox/launch/online_async_launch.py"
             ),
             launch_arguments={
                 "use_sim_time": "false",
@@ -65,6 +62,7 @@ def launch_setup(context):
     # MODE 2: Navigation — navigate with saved map
     # ─────────────────────────────────────────────
     elif mode == "navigation":
+
         localization_launch = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(blazerbot_nav_dir, "launch", "localization.launch.py")
