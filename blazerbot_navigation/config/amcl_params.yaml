@@ -1,0 +1,45 @@
+amcl:
+  ros__parameters:
+    use_sim_time: true
+
+    # Particle filter settings
+    min_particles: 500
+    max_particles: 2000
+    alpha1: 0.2
+    alpha2: 0.2
+    alpha3: 0.2
+    alpha4: 0.2
+    alpha5: 0.2
+
+    # Frames — must match your URDF
+    base_frame_id: base_link
+    odom_frame_id: odom
+    global_frame_id: map
+    scan_topic: scan
+
+    # Laser model
+    laser_model_type: likelihood_field
+    laser_max_range: 6.0
+    laser_min_range: 0.05
+    laser_likelihood_max_dist: 2.0
+    max_beams: 60
+
+    # Update thresholds
+    update_min_a: 0.2
+    update_min_d: 0.25
+
+    # Resampling
+    resample_interval: 1
+    recovery_alpha_slow: 0.0
+    recovery_alpha_fast: 0.0
+
+    # Initial pose — robot spawns at center of arena
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+
+    always_reset_initial_pose: false
+    save_pose_to_file: false
