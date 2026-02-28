@@ -1,5 +1,15 @@
-bash
-ros2 service call /slam_toolbox/dynamic_map nav_msgs/srv/GetMap {}
-If that returns a map, SLAM has built it internally but just isn't publishing to the topic. Also check:
-bash
-ros2 topic echo /map_updates --once
+development/ros/ros2_ws …
+➜ ros2 service call /slam_toolbox/dynamic_map nav_msgs/srv/GetMap {}                           
+requester: making request: nav_msgs.srv.GetMap_Request()
+
+response:
+nav_msgs.srv.GetMap_Response(map=nav_msgs.msg.OccupancyGrid(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=0, nanosec=0), frame_id=''), info=nav_msgs.msg.MapMetaData(map_load_time=builtin_interfaces.msg.Time(sec=0, nanosec=0), resolution=0.0, width=0, height=0, origin=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=0.0, y=0.0, z=0.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), data=[]))
+
+
+development/ros/ros2_ws …
+➜ ros2 topic echo /map_updates --once
+WARNING: topic [/map_updates] does not appear to be published yet
+Could not determine the type for the passed topic
+
+development/ros/ros2_ws …
+➜ 
