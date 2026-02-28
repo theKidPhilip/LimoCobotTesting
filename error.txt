@@ -1,98 +1,18 @@
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 1001 ms
-[INFO] [async_slam_toolbox_node-9]: process started with pid [143306]
-[async_slam_toolbox_node-9] 2026-02-28 16:27:28.473 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0x7A8808E0
-[async_slam_toolbox_node-9] [INFO] [1772296048.537591037] [slam_toolbox]: Node using stack size 40000000
-[async_slam_toolbox_node-9] 2026-02-28 16:27:28.857 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
-[async_slam_toolbox_node-9] [INFO] [1772296048.948150674] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
-[async_slam_toolbox_node-9] [INFO] [1772296048.949900356] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2098 ms
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Scan Frequency: 10.00Hz
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Fixed Size: 400
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Sample Rate: 4.00K
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to check the lidar, Elapsed time 0 ms
-[ydlidar_ros2_driver_node-8] [2026-02-28 16:27:29][info] [YDLIDAR] Now lidar is scanning...
-[async_slam_toolbox_node-9] [WARN] [1772296049.162344264] [slam_toolbox]: minimum laser range setting (0.0 m) exceeds the capabilities of the used Lidar (0.0 m)
-[async_slam_toolbox_node-9] Registering sensor: [Custom Described Lidar]
-[async_slam_toolbox_node-9] LaserRangeScan contains 244 range readings, expected 245
-[async_slam_toolbox_node-9] [INFO] [1772296049.272573980] [slam_toolbox]: Message Filter dropping message: frame 'laser_link' at time 1772296048.987 for reason 'the timestamp on the message is earlier than all the data in the transform cache'
-[async_slam_toolbox_node-9] LaserRangeScan contains 244 range readings, expected 245
-development/ros/ros2_ws …
-➜ rviz2
-[INFO] [1772291451.959923540] [rviz2]: Stereo is NOT SUPPORTED
-[INFO] [1772291451.960266525] [rviz2]: OpenGl version: 4.6 (GLSL 4.6)
-[INFO] [1772291452.115853698] [rviz2]: Stereo is NOT SUPPORTED
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-terminate called after throwing an instance of 'std::overflow_error'
-  what():  addition leads to int64_t overflow
-[1]    42628 abort (core dumped)  rviz2
+development/ros/ros2_ws took 31.9s …
+➜ ros2 launch limo_bringup limo_mapping.launch.py                    
+[INFO] [launch]: All log files can be found below /home/limo/.ros/log/2026-02-28-16-36-03-861339-ashlimo01-155525
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [async_slam_toolbox_node-1]: process started with pid [155541]
+[async_slam_toolbox_node-1] [INFO] [1772296564.040171842] [slam_toolbox]: Node using stack size 40000000
+[async_slam_toolbox_node-1] [INFO] [1772296564.100883693] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-1] [INFO] [1772296564.101326042] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
+[async_slam_toolbox_node-1] [WARN] [1772296635.141254290] [slam_toolbox]: minimum laser range setting (0.0 m) exceeds the capabilities of the used Lidar (0.0 m)
+[async_slam_toolbox_node-1] Registering sensor: [Custom Described Lidar]
+[async_slam_toolbox_node-1] LaserRangeScan contains 244 range readings, expected 245
+[async_slam_toolbox_node-1] LaserRangeScan contains 244 range readings, expected 245
+[async_slam_toolbox_node-1] LaserRangeScan contains 244 range readings, expected 245
 
-development/ros/ros2_ws took 32m 38.6s …
-➜ rviz2
-[INFO] [1772293713.133036599] [rviz2]: Stereo is NOT SUPPORTED
-[INFO] [1772293713.133276419] [rviz2]: OpenGl version: 4.6 (GLSL 4.6)
-[INFO] [1772293713.223800063] [rviz2]: Stereo is NOT SUPPORTED
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
 
-development/ros/ros2_ws took 30m 23.6s …
-➜ rviz2
-2026-02-28 16:19:05.854 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
-[INFO] [1772295546.904476268] [rviz2]: Stereo is NOT SUPPORTED
-[INFO] [1772295546.904766815] [rviz2]: OpenGl version: 4.6 (GLSL 4.6)
-[INFO] [1772295546.999938434] [rviz2]: Stereo is NOT SUPPORTED
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-[ERROR] [1772296049.529785972] [rviz2]: Lookup would require extrapolation at time 1772296049.346728, but only time 1772296049.546728 is in the buffer, when looking up transform from frame [laser_link] to frame [map]
-[ERROR] [1772296049.529981786] [rviz2]: Lookup would require extrapolation at time 1772296049.253751, but only time 1772296049.546728 is in the buffer, when looking up transform from frame [laser_link] to frame [map]
-[ERROR] [1772296049.530078429] [rviz2]: Lookup would require extrapolation at time 1772296049.161207, but only time 1772296049.546728 is in the buffer, when looking up transform from frame [laser_link] to frame [map]
-[ERROR] [1772296049.530183648] [rviz2]: Lookup would require extrapolation at time 1772296049.071414, but only time 1772296049.546728 is in the buffer, when looking up transform from frame [laser_link] to frame [map]
-[ERROR] [1772296049.530289667] [rviz2]: Lookup would require extrapolation at time 1772296048.987483, but only time 1772296049.546728 is in the buffer, when looking up transform from frame [laser_link] to frame [map]
-[INFO] [1772296059.512129327] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772296049.443 for reason 'the timestamp on the message is earlier than all the data in the transform cache'
-^C[INFO] [1772296199.797695220] [rclcpp]: signal_handler(SIGINT/SIGTERM)
 
-development/ros/ros2_ws took 10m 54.7s …
-➜ 
+[ydlidar_ros2_driver_node-8] [2026-02-28 16:37:15][info] [YDLIDAR] Now lidar is scanning...
+[ydlidar_ros2_driver_node-8] [WARN] [1772296656.470311012] [ydlidar_ros2_driver_node]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
