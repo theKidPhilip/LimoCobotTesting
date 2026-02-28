@@ -1,65 +1,9 @@
-limo_ros2 took 4m 56.0s …
-➜ rviz2
-[INFO] [1772296978.504044637] [rviz2]: Stereo is NOT SUPPORTED
-[INFO] [1772296978.504338277] [rviz2]: OpenGl version: 4.6 (GLSL 4.6)
-[INFO] [1772296978.596669945] [rviz2]: Stereo is NOT SUPPORTED
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-[INFO] [1772296991.976601265] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772296990.870 for reason 'discarding message because the queue is full'
-[INFO] [1772296994.570084721] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772296993.464 for reason 'discarding message because the queue is full'
-[INFO] [1772296997.160938953] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772296996.057 for reason 'discarding message because the queue is full'
-[INFO] [1772296999.752292527] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772296998.650 for reason 'discarding message because the queue is full'
-[INFO] [1772297002.345075068] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297001.244 for reason 'discarding message because the queue is full'
-[INFO] [1772297004.936485603] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297003.837 for reason 'discarding message because the queue is full'
-[INFO] [1772297007.528842884] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297006.432 for reason 'discarding message because the queue is full'
-[INFO] [1772297010.152902608] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297009.024 for reason 'discarding message because the queue is full'
-[INFO] [1772297012.745360500] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297011.618 for reason 'discarding message because the queue is full'
-[INFO] [1772297015.340420064] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297014.212 for reason 'discarding message because the queue is full'
-[INFO] [1772297017.928915063] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297016.805 for reason 'discarding message because the queue is full'
-[INFO] [1772297020.521577697] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297019.399 for reason 'discarding message because the queue is full'
 
-limo_ros2 took 45.0s …
-➜ rviz2
-[INFO] [1772297090.291145589] [rviz2]: Stereo is NOT SUPPORTED
-[INFO] [1772297090.291381084] [rviz2]: OpenGl version: 4.6 (GLSL 4.6)
-[INFO] [1772297090.380665659] [rviz2]: Stereo is NOT SUPPORTED
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'laser_link' material 'laser_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-Warning: link 'imu_link' material 'imu_material' undefined.
-         at line 84 in ./urdf_parser/src/model.cpp
-[INFO] [1772297103.404645683] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297102.303 for reason 'discarding message because the queue is full'
-[INFO] [1772297105.995947447] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297104.897 for reason 'discarding message because the queue is full'
-[INFO] [1772297108.620331115] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297107.491 for reason 'discarding message because the queue is full'
-[INFO] [1772297111.212814287] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297110.085 for reason 'discarding message because the queue is full'
-[INFO] [1772297113.804332345] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297112.679 for reason 'discarding message because the queue is full'
-[INFO] [1772297116.396586199] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297115.272 for reason 'discarding message because the queue is full'
-[INFO] [1772297118.988196451] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297117.865 for reason 'discarding message because the queue is full'
-[INFO] [1772297121.580856780] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297120.459 for reason 'discarding message because the queue is full'
-[INFO] [1772297124.173045928] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297123.053 for reason 'discarding message because the queue is full'
-[INFO] [1772297126.764309162] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297125.646 for reason 'discarding message because the queue is full'
-[INFO] [1772297129.356911890] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297128.240 for reason 'discarding message because the queue is full'
-[INFO] [1772297131.948905672] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297130.833 for reason 'discarding message because the queue is full'
-[INFO] [1772297134.540718714] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297133.426 for reason 'discarding message because the queue is full'
-[INFO] [1772297137.133093307] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772297136.020 for reason 'discarding message because the queue is full'
-^C[INFO] [1772297138.151754947] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+development/ros/ros2_ws took 4.1s …
+➜ ros2 run tf2_tools view_frames                      
+[INFO] [1772297924.784437143] [view_frames]: Listening to tf data for 5.0 seconds...
+[INFO] [1772297929.790943689] [view_frames]: Generating graph in frames.pdf file...
+[INFO] [1772297929.800494241] [view_frames]: Result:tf2_msgs.srv.FrameGraph_Response(frame_yaml="odom: \n  parent: 'map'\n  broadcaster: 'default_authority'\n  rate: 10.219\n  most_recent_transform: 1772297929.835265\n  oldest_transform: 1772297924.746934\n  buffer_length: 5.088\nbase_link: \n  parent: 'odom'\n  broadcaster: 'default_authority'\n  rate: 50.146\n  most_recent_transform: 1772297929.792501\n  oldest_transform: 1772297924.727327\n  buffer_length: 5.065\nfront_left_wheel_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10.200\n  most_recent_transform: 1772297929.738256\n  oldest_transform: 1772297924.738405\n  buffer_length: 5.000\nfront_right_wheel_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10.200\n  most_recent_transform: 1772297929.738256\n  oldest_transform: 1772297924.738405\n  buffer_length: 5.000\nrear_left_wheel_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10.200\n  most_recent_transform: 1772297929.738256\n  oldest_transform: 1772297924.738405\n  buffer_length: 5.000\nrear_right_wheel_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10.200\n  most_recent_transform: 1772297929.738256\n  oldest_transform: 1772297924.738405\n  buffer_length: 5.000\ncamera_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10000.000\n  most_recent_transform: 0.000000\n  oldest_transform: 0.000000\n  buffer_length: 0.000\ndepth_camera_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10000.000\n  most_recent_transform: 0.000000\n  oldest_transform: 0.000000\n  buffer_length: 0.000\ndepth_link: \n  parent: 'depth_camera_link'\n  broadcaster: 'default_authority'\n  rate: 10000.000\n  most_recent_transform: 0.000000\n  oldest_transform: 0.000000\n  buffer_length: 0.000\nimu_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10000.000\n  most_recent_transform: 0.000000\n  oldest_transform: 0.000000\n  buffer_length: 0.000\ninertial_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10000.000\n  most_recent_transform: 0.000000\n  oldest_transform: 0.000000\n  buffer_length: 0.000\nlaser_link: \n  parent: 'base_link'\n  broadcaster: 'default_authority'\n  rate: 10000.000\n  most_recent_transform: 0.000000\n  oldest_transform: 0.000000\n  buffer_length: 0.000\n")
 
-limo_r
-
+development/ros/ros2_ws took 7.1s …
+➜ evince frames.pdf     
