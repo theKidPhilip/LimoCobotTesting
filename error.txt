@@ -1,111 +1,162 @@
-publisher-5]: process started with pid [13731]
-[INFO] [static_transform_publisher-6]: process started with pid [13733]
-[static_transform_publisher-4] [WARN] [1772150720.043280892] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-6] [WARN] [1772150720.043135276] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-3] [WARN] [1772150720.071770377] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-5] [WARN] [1772150720.081608766] []: Old-style arguments are deprecated; see --help for new-style arguments
-[static_transform_publisher-4] [INFO] [1772150720.147479407] [base_link_to_laser_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-4] translation: ('0.180000', '0.000000', '0.000000')
-[static_transform_publisher-4] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-4] from 'base_link' to 'laser_link'
-[static_transform_publisher-6] [INFO] [1772150720.179505160] [base_link_to_imu_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-6] translation: ('0.000000', '0.000000', '0.000000')
-[static_transform_publisher-6] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-6] from 'base_link' to 'imu_link'
-[static_transform_publisher-5] [INFO] [1772150720.186513927] [base_link_to_camera_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-5] translation: ('0.180000', '0.000000', '0.180000')
-[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-5] from 'base_link' to 'camera_link'
-[ydlidar_ros2_driver_node-8] [INFO] [1772150720.187681740] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Current ROS Driver Version: 1.0.1
-[ydlidar_ros2_driver_node-8] 
-[static_transform_publisher-3] [INFO] [1772150720.203044477] [base_footprint_to_base_link_tf]: Spinning until stopped - publishing transform
-[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.150000')
-[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-[static_transform_publisher-3] from 'base_footprint' to 'base_link'
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK initializing
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK has been initialized
-[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK Version: 1.2.7
-[limo_base-7] Loading parameters: 
-[limo_base-7] - port name: ttyTHS1
-[limo_base-7] - odom frame name: odom
-[limo_base-7] - base frame name: base_link
-[limo_base-7] - odom topic name: 1
-[limo_base-7] - use_mcnamu_: 0
-[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
-[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
-[robot_state_publisher-1] [INFO] [1772150720.236327057] [robot_state_publisher]: got segment base_footprint
-[robot_state_publisher-1] [INFO] [1772150720.236702505] [robot_state_publisher]: got segment base_link
-[robot_state_publisher-1] [INFO] [1772150720.236729414] [robot_state_publisher]: got segment depth_camera_link
-[robot_state_publisher-1] [INFO] [1772150720.236741189] [robot_state_publisher]: got segment depth_link
-[robot_state_publisher-1] [INFO] [1772150720.236751044] [robot_state_publisher]: got segment front_left_wheel_link
-[robot_state_publisher-1] [INFO] [1772150720.236760611] [robot_state_publisher]: got segment front_right_wheel_link
-[robot_state_publisher-1] [INFO] [1772150720.236769506] [robot_state_publisher]: got segment imu_link
-[robot_state_publisher-1] [INFO] [1772150720.236778337] [robot_state_publisher]: got segment inertial_link
-[robot_state_publisher-1] [INFO] [1772150720.236787136] [robot_state_publisher]: got segment laser_link
-[robot_state_publisher-1] [INFO] [1772150720.236795520] [robot_state_publisher]: got segment rear_left_wheel_link
-[robot_state_publisher-1] [INFO] [1772150720.236804607] [robot_state_publisher]: got segment rear_right_wheel_link
-[limo_base-7] [INFO] [1772150720.251935208] [limo_base]: connet the serial port:'/dev/ttyTHS1'
-[limo_base-7] [INFO] [1772150720.258162777] [limo_base]: enableCommandedMode :
-[limo_base-7] [INFO] [1772150720.258288299] [limo_base]: Open the serial port:'/dev/ttyTHS1'
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar successfully connected [/dev/ttyUSB0:230400]
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar running correctly! The health status: good
-[joint_state_publisher-2] [INFO] [1772150720.919004103] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
-[wall_follower-9] [INFO] [1772150720.992353478] [wall_follower]: WallFollowerNode started. side=right, wall_distance=0.5, kp=1.2, kd=0.15
-[ydlidar_ros2_driver_node-8] Current Lidar Model Code 151
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Baseplate device info
-[ydlidar_ros2_driver_node-8] Firmware version: 1.2
-[ydlidar_ros2_driver_node-8] Hardware version: 1
-[ydlidar_ros2_driver_node-8] Model: Tmini Plus
-[ydlidar_ros2_driver_node-8] Serial: 2024092600090187
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 995 ms
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0xA5DB98E0
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2097 ms
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Scan Frequency: 10.00Hz
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Fixed Size: 400
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Sample Rate: 4.00K
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to check the lidar, Elapsed time 0 ms
-[ydlidar_ros2_driver_node-8] [2026-02-27 00:05:23][info] [YDLIDAR] Now lidar is scanning...
-[wall_follower-9] [WARN] [1772150723.313261898] [wall_follower]: New publisher discovered on topic 'scan', offering incompatible QoS. No messages will be received from it. Last incompatible policy: RELIABILITY
-[ydlidar_ros2_driver_node-8] [WARN] [1772150723.359972847] [ydlidar_ros2_driver_node]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
-^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
-[limo_base-7] [INFO] [1772150742.045326785] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[INFO] [static_transform_publisher-5]: process has finished cleanly [pid 13731]
-[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 13727]
-[INFO] [static_transform_publisher-6]: process has finished cleanly [pid 13733]
-[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 13723]
-[INFO] [static_transform_publisher-4]: process has finished cleanly [pid 13729]
-[ERROR] [limo_base-7]: process has died [pid 13735, exit code -6, cmd '/home/limo/development/ros/ros2_ws/install/limo_base/lib/limo_base/limo_base --ros-args --params-file /tmp/launch_params_d6bzs04a'].
-[INFO] [joint_state_publisher-2]: process has finished cleanly [pid 13725]
-[ERROR] [wall_follower-9]: process has died [pid 13739, exit code 1, cmd '/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower --ros-args -r __node:=wall_follower'].
-[robot_state_publisher-1] [INFO] [1772150742.045327553] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-4] [INFO] [1772150742.045395727] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-3] [INFO] [1772150742.045502515] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[ydlidar_ros2_driver_node-8] [INFO] [1772150742.047050488] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[ydlidar_ros2_driver_node-8] [INFO] [1772150742.085284428] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Now YDLIDAR is stopping .......
-[static_transform_publisher-6] [INFO] [1772150742.046253387] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[static_transform_publisher-5] [INFO] [1772150742.047204143] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[limo_base-7] terminate called without an active exception
-[wall_follower-9] Traceback (most recent call last):
-[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/wall_follower/wall_follower", line 33, in <module>
-[wall_follower-9]     sys.exit(load_entry_point('wall-follower==0.0.0', 'console_scripts', 'wall_follower')())
-[wall_follower-9]   File "/home/limo/development/ros/ros2_ws/install/wall_follower/lib/python3.10/site-packages/wall_follower/scripts/wall_follower.py", line 235, in main
-[wall_follower-9]     node.cmd_pub.publish(stop)
-[wall_follower-9]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/publisher.py", line 70, in publish
-[wall_follower-9]     self.__publisher.publish(msg)
-[wall_follower-9] rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:389
-[ydlidar_ros2_driver_node-8] [YDLIDAR] Now lidar scanning has stopped!
-[INFO] [ydlidar_ros2_driver_node-8]: process has finished cleanly [pid 13737]
+imo_ros2 on 🐳 v29.1.4 took 6.8s …
+➜ ros2 node list            
+/base_footprint_to_base_link_tf
+/base_link_to_camera_tf
+/base_link_to_imu_tf
+/base_link_to_laser_tf
+/joint_state_publisher
+/launch_ros_84663
+/limo_base
+/robot_state_publisher
+/rviz
+/slam_toolbox
+/teleop_twist_keyboard
+/transform_listener_impl_aaaad80699f0
+/transform_listener_impl_aaab07df6490
+/ydlidar_ros2_driver_node
 
-development/ros/ros2_ws took 24.9s …
+limo_ros2 on  testing [!?] on 🐳 v29.1.4 …
+➜ 
+development/ros/ros2_ws took 3m 24.8s …
+➜ ros2 launch /opt/ros/humble/share/slam_toolbox/launch/online_async_launch.py use_sim_t
+ime:=false slam_params_file:=/path/to/limo_slam_params.yaml
+[INFO] [launch]: All log files can be found below /home/limo/.ros/log/2026-02-28-15-56-29-990786-ashlimo01-98911
+[INFO] [launch]: Default logging verbosity is set to INFO
+[WARNING] [launch_ros.actions.node]: Parameter file path is not a file: /path/to/limo_slam_params.yaml
+[INFO] [async_slam_toolbox_node-1]: process started with pid [98922]
+[async_slam_toolbox_node-1] [INFO] [1772294190.274595955] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-1] [INFO] [1772294190.725776766] [slam_toolbox]: Message Filter dropping message: frame 'laser_link' at time 1772294190.526 for reason 'discarding message because the queue is full'
+[async_slam_toolbox_node-1] [WARN] [1772294190.747782586] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294190.826582574] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294190.925399265] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.025621035] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.124859708] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.225055133] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.324271228] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.423670570] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.523894490] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.623143908] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.723227083] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.823150357] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294191.922362742] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.022580752] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.121805011] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.221224447] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.321408186] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.420602384] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.520723920] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.620062958] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.719742779] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.819639301] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294192.918960397] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.019247782] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.119177744] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.218287430] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.317636877] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.417867746] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.516982326] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.616563569] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.716760475] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.816696098] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294193.915881898] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.015966382] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.115287070] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.214709011] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.314840611] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.414077669] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.514411581] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.613505779] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.713674765] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.813046176] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294194.913169173] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.012274937] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.111747765] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.211971035] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.311085928] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.411218499] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.510873429] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.610760799] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.709958939] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.810319761] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294195.909379774] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.009684307] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.108921165] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.208329700] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.307801558] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.408076281] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.507469305] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.607381646] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.707321586] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.806848581] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294196.907036410] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.006543071] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.106619362] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.206301284] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.305521135] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.405899589] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.505186505] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.604470990] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.703943784] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.803395918] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294197.902934659] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.003137223] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.102316549] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.201806963] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.301296193] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.401475691] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.501140535] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.600490995] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.700622104] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.800027574] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.900309670] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294198.999586189] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.099764869] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.199467091] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.298840153] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.398115221] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.498405211] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.597677592] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.697063319] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.796645608] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.896903808] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294199.997037437] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294200.096058139] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294200.196405975] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294200.295246514] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294200.395485162] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294200.495076871] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294200.594180017] [slam_toolbox]: Failed to compute odom pose
+[async_slam_toolbox_node-1] [WARN] [1772294200.694609855] [slam_toolbox]: Failed to compute odom pose
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[async_slam_toolbox_node-1] [INFO] [1772294200.742523100] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [async_slam_toolbox_node-1]: process has finished cleanly [pid 98922]
+
+development/ros/ros2_ws took 11.9s …
+➜ 
+
+
+limo_ros2 on  testing [!?] on 🐳 v29.1.4 …
+➜ ros2 run tf2_ros tf2_echo odom base_footprint
+[INFO] [1772294259.565343236] [tf2_echo]: Waiting for transform odom ->  base_footprint: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist
+[INFO] [1772294261.515767563] [tf2_echo]: Waiting for transform odom ->  base_footprint: Could not find a connection between 'odom' and 'base_footprint' because they are not part of the same tree.Tf has two or more unconnected trees.
+[INFO] [1772294262.515784542] [tf2_echo]: Waiting for transform odom ->  base_footprint: Could not find a connection between 'odom' and 'base_footprint' because they are not part of the same tree.Tf has two or more unconnected trees.
+[INFO] [1772294264.515783803] [tf2_echo]: Waiting for transform odom ->  base_footprint: Could not find a connection between 'odom' and 'base_footprint' because they are not part of the same tree.Tf has two or more unconnected trees.
+[INFO] [1772294266.515782647] [tf2_echo]: Waiting for transform odom ->  base_footprint: Could not find a connection between 'odom' and 'base_footprint' because they are not part of the same tree.Tf has two or more unconnected trees.
+^Z
+[1]  + 100693 suspended  ros2 run tf2_ros tf2_echo odom base_footprint
+
+limo_ros2 took 8.8s …
+✦ ➜ 
+
+limo_ros2 on  testing [!?] …
+✦ ➜ 
+
+✦ ➜ 
+
+limo_ros2 on  testing [!?] …
+✦ ➜ ros2 param get /limo_base pub_odom_tf        
+2026-02-28 15:58:52.326 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
+Boolean value is: True
+
+limo_ros2 took 4.1s …
+✦ ➜ 
