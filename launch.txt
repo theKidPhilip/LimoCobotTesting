@@ -61,3 +61,176 @@ Package 'topic_tools' not found
 
 development/ros/ros2_ws …
 ➜ 
+
+ [WARN] [1772298867.515378974] [ydlidar_ros2_driver_node]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+
+
+
+ rviz2             
+[INFO] [1772298867.235987453] [rviz2]: Stereo is NOT SUPPORTED
+[INFO] [1772298867.236222483] [rviz2]: OpenGl version: 4.6 (GLSL 4.6)
+[INFO] [1772298867.288207126] [rviz2]: Stereo is NOT SUPPORTED
+Warning: link 'laser_link' material 'laser_material' undefined.
+         at line 84 in ./urdf_parser/src/model.cpp
+Warning: link 'laser_link' material 'laser_material' undefined.
+         at line 84 in ./urdf_parser/src/model.cpp
+Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+         at line 84 in ./urdf_parser/src/model.cpp
+Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+         at line 84 in ./urdf_parser/src/model.cpp
+Warning: link 'imu_link' material 'imu_material' undefined.
+         at line 84 in ./urdf_parser/src/model.cpp
+Warning: link 'imu_link' material 'imu_material' undefined.
+         at line 84 in ./urdf_parser/src/model.cpp
+[ERROR] [1772298899.183394535] [rviz2]: Could not find a connection between 'base_footprint' and 'laser_link' because they are not part of the same tree.Tf has two or more unconnected trees.
+[INFO] [1772298900.225237445] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298899.122 for reason 'discarding message because the queue is full'
+[INFO] [1772298902.817340157] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298901.714 for reason 'discarding message because the queue is full'
+[INFO] [1772298905.409221228] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298904.306 for reason 'discarding message because the queue is full'
+[INFO] [1772298908.001451698] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298906.899 for reason 'discarding message because the queue is full'
+[INFO] [1772298910.593082910] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298909.492 for reason 'discarding message because the queue is full'
+[ERROR] [1772298977.263178616] [rviz2]: Could not find a connection between 'base_footprint' and 'laser_link' because they are not part of the same tree.Tf has two or more unconnected trees.
+[INFO] [1772298978.326503034] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298977.205 for reason 'discarding message because the queue is full'
+[INFO] [1772298980.925516575] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298979.799 for reason 'discarding message because the queue is full'
+[INFO] [1772298983.517337786] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298982.392 for reason 'discarding message because the queue is full'
+[INFO] [1772298986.110032133] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298984.984 for reason 'discarding message because the queue is full'
+[INFO] [1772298988.702061052] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298987.578 for reason 'discarding message because the queue is full'
+[INFO] [1772298991.299867004] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298990.171 for reason 'discarding message because the queue is full'
+[INFO] [1772298993.886551658] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298992.764 for reason 'discarding message because the queue is full'
+[INFO] [1772298996.463253537] [rviz]: Message Filter dropping message: frame 'laser_link' at time 1772298995.358 for reason 'discarding message because the queue is full'
+
+
+
+
+development/ros/ros2_ws took 4.3s …
+➜ source install/setup.zsh
+
+development/ros/ros2_ws …
+➜ ros2 topic hz /scan                             
+average rate: 10.031
+        min: 0.099s max: 0.100s std dev: 0.00048s window: 12
+average rate: 10.028
+        min: 0.099s max: 0.100s std dev: 0.00043s window: 23
+average rate: 10.027
+        min: 0.099s max: 0.100s std dev: 0.00045s window: 34
+^C%                                                                                     
+
+development/ros/ros2_ws took 6.2s …
+➜ ros2 node info /slam_toolbox | grep -A5 Subscribers
+Unable to find node '/slam_toolbox'
+
+development/ros/ros2_ws …
+➜ ros2 node info /slam_toolbox                       
+/slam_toolbox
+  Subscribers:
+    /clock: rosgraph_msgs/msg/Clock
+    /map: nav_msgs/msg/OccupancyGrid
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /scan: sensor_msgs/msg/LaserScan
+    /slam_toolbox/feedback: visualization_msgs/msg/InteractiveMarkerFeedback
+  Publishers:
+    /map: nav_msgs/msg/OccupancyGrid
+    /map_metadata: nav_msgs/msg/MapMetaData
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /pose: geometry_msgs/msg/PoseWithCovarianceStamped
+    /rosout: rcl_interfaces/msg/Log
+    /slam_toolbox/graph_visualization: visualization_msgs/msg/MarkerArray
+    /slam_toolbox/scan_visualization: sensor_msgs/msg/LaserScan
+    /slam_toolbox/update: visualization_msgs/msg/InteractiveMarkerUpdate
+    /tf: tf2_msgs/msg/TFMessage
+  Service Servers:
+    /slam_toolbox/clear_changes: slam_toolbox/srv/Clear
+    /slam_toolbox/describe_parameters: rcl_interfaces/srv/DescribeParameters
+    /slam_toolbox/deserialize_map: slam_toolbox/srv/DeserializePoseGraph
+    /slam_toolbox/dynamic_map: nav_msgs/srv/GetMap
+    /slam_toolbox/get_interactive_markers: visualization_msgs/srv/GetInteractiveMarkers
+    /slam_toolbox/get_parameter_types: rcl_interfaces/srv/GetParameterTypes
+    /slam_toolbox/get_parameters: rcl_interfaces/srv/GetParameters
+    /slam_toolbox/list_parameters: rcl_interfaces/srv/ListParameters
+    /slam_toolbox/manual_loop_closure: slam_toolbox/srv/LoopClosure
+    /slam_toolbox/pause_new_measurements: slam_toolbox/srv/Pause
+    /slam_toolbox/save_map: slam_toolbox/srv/SaveMap
+    /slam_toolbox/serialize_map: slam_toolbox/srv/SerializePoseGraph
+    /slam_toolbox/set_parameters: rcl_interfaces/srv/SetParameters
+    /slam_toolbox/set_parameters_atomically: rcl_interfaces/srv/SetParametersAtomically
+    /slam_toolbox/toggle_interactive_mode: slam_toolbox/srv/ToggleInteractive
+  Service Clients:
+
+  Action Servers:
+
+  Action Clients:
+
+
+development/ros/ros2_ws …
+➜ ros2 run topic_tools relay /scan /scan_reliable --ros-args -p input_topic:=/scan -p output_topic:=/scan_reliable
+Package 'topic_tools' not found
+
+development/ros/ros2_ws …
+➜ ros2 topic info /scan --verbose
+Type: sensor_msgs/msg/LaserScan
+
+Publisher count: 1
+
+Node name: ydlidar_ros2_driver_node
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: PUBLISHER
+GID: 01.0f.14.ee.67.4c.72.6a.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 2
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.14.ee.3a.4e.a0.a0.00.00.01.00.00.00.24.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: rviz
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.14.ee.d9.4e.25.f4.00.00.00.00.00.00.2a.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+
+development/ros/ros2_ws …
+➜ ros2 topic echo /map --once    
+
+^C%                                                                                     
+
+development/ros/ros2_ws took 3m 39.5s …
+➜ ros2 topic echo /map --once
+
+
+
+development/ros/ros2_ws took 4.1s …
+➜ source install/setup.zsh
+
+development/ros/ros2_ws …
+➜ ros2 topic hz /map                                  
+^C%                                                                                     
+
+development/ros/ros2_ws took 1m 11.2s …
+➜ ros2 topic hz /map
