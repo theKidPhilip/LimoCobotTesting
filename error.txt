@@ -3,7 +3,8 @@ bashros2 topic hz /scan
 And check SLAM node info:
 bashros2 node info /slam_toolbox | grep -A5 Subscribers
 If /scan is publishing but SLAM isn't receiving it, it's the QoS mismatch. Fix it by adding a scan relay node that converts QoS. Run this in a new terminal:
-bashros2 run topic_tools relay /scan /scan_reliable --ros-args -p input_topic:=/scan -p output_topic:=/scan_reliable
+bash
+ros2 run topic_tools relay /scan /scan_reliable --ros-args -p input_topic:=/scan -p output_topic:=/scan_reliable
 Then update limo_slam_params.yaml:
 yamlscan_topic: /scan_reliable
 But first just confirm:
