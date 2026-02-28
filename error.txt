@@ -1,258 +1,113 @@
 
-development/ros/ros2_ws …
-✦ ➜ ros2 node list
-/base_footprint_to_base_link_tf
-/base_link_to_camera_tf
-/base_link_to_imu_tf
-/base_link_to_laser_tf
-/joint_state_publisher
-/launch_ros_118772
-/limo_base
-/robot_state_publisher
-/ydlidar_ros2_driver_node
-
-development/ros/ros2_ws …
-✦ ➜ ros2 run tf2_ros tf2_echo odom laser_link    
-2026-02-28 16:12:47.594 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
-[INFO] [1772295167.632523419] [tf2_echo]: Waiting for transform odom ->  laser_link: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist
-[INFO] [1772295169.587150480] [tf2_echo]: Waiting for transform odom ->  laser_link: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist
-At time 1772295170.575109894
-- Translation: [-0.148, 0.103, 0.000]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.148
-  0.572 -0.820  0.000  0.103
-  0.000  0.000  1.000  0.000
-  0.000  0.000  0.000  1.000
-^C[INFO] [1772295171.196245631] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-
-development/ros/ros2_ws took 4.3s …
-✦ ➜ ros2 run tf2_ros tf2_echo odom laser_link
-2026-02-28 16:12:57.488 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
-[INFO] [1772295177.527668972] [tf2_echo]: Waiting for transform odom ->  laser_link: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist
-At time 1772295179.465490997
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295180.466573745
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295181.467709360
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295182.468825437
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295183.469968084
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295184.471087001
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295185.472271971
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295186.473332573
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295187.474460482
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295188.475546402
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295189.476616152
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295190.477701118
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295191.478779714
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295192.479935486
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295193.461064051
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295194.462016386
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295195.463124101
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295196.464286928
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-At time 1772295197.465224678
-- Translation: [-0.084, 0.059, -0.034]
-- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.954, 0.300]
-- Rotation: in RPY (radian) [0.000, -0.000, 2.532]
-- Rotation: in RPY (degree) [0.000, -0.000, 145.100]
-- Matrix:
- -0.820 -0.572  0.000 -0.084
-  0.572 -0.820  0.000  0.059
-  0.000  0.000  1.000 -0.034
-  0.000  0.000  0.000  1.000
-^C[INFO] [1772295197.567905681] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-
-development/ros/ros2_ws took 20.8s …
-✦ ➜ ros2 topic echo /tf --once               
-2026-02-28 16:13:25.098 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
-transforms:
-- header:
-    stamp:
-      sec: 1772295206
-      nanosec: 94395879
-    frame_id: odom
-  child_frame_id: base_link
-  transform:
-    translation:
-      x: 0.0
-      y: 0.0
-      z: 0.0
-    rotation:
-      x: 0.0
-      y: 0.0
-      z: 0.9539790028805069
-      w: 0.29987341006350315
----
-
-development/ros/ros2_ws took 2.1s …
-✦ ➜ 
-
-development/ros/ros2_ws …
-✦ ➜ ros2 param get /limo_base base_frame
-2026-02-28 16:13:48.847 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
-String value is: base_link
+development/ros/ros2_ws took 4m 4.1s …
+➜ ros2 launch blazerbot_bringup robot_bringup.launch.py mode:=mapping
+[INFO] [launch]: All log files can be found below /home/limo/.ros/log/2026-02-28-16-16-38-745760-ashlimo01-128111
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [limo_base-7]: process started with pid [128186]
+[INFO] [ydlidar_ros2_driver_node-8]: process started with pid [128189]
+[INFO] [robot_state_publisher-1]: process started with pid [128148]
+[INFO] [joint_state_publisher-2]: process started with pid [128150]
+[INFO] [static_transform_publisher-3]: process started with pid [128152]
+[INFO] [static_transform_publisher-4]: process started with pid [128154]
+[INFO] [static_transform_publisher-5]: process started with pid [128156]
+[INFO] [static_transform_publisher-6]: process started with pid [128162]
+[static_transform_publisher-3] [WARN] [1772295399.299256319] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-4] [WARN] [1772295399.299277792] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-4] [INFO] [1772295399.353389827] [base_link_to_laser_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-4] translation: ('0.180000', '0.000000', '0.000000')
+[static_transform_publisher-4] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-4] from 'base_link' to 'laser_link'
+[static_transform_publisher-5] [WARN] [1772295399.312390572] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-3] [INFO] [1772295399.367765558] [base_footprint_to_base_link_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.150000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'base_footprint' to 'base_link'
+[static_transform_publisher-6] [WARN] [1772295399.377714338] []: Old-style arguments are deprecated; see --help for new-style arguments
+[static_transform_publisher-5] [INFO] [1772295399.417783645] [base_link_to_camera_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-5] translation: ('0.180000', '0.000000', '0.180000')
+[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-5] from 'base_link' to 'camera_link'
+[ydlidar_ros2_driver_node-8] [INFO] [1772295399.467293526] [ydlidar_ros2_driver_node]: [YDLIDAR INFO] Current ROS Driver Version: 1.0.1
+[ydlidar_ros2_driver_node-8] 
+[limo_base-7] Loading parameters: 
+[limo_base-7] - port name: ttyTHS1
+[limo_base-7] - odom frame name: odom
+[limo_base-7] - base frame name: base_link
+[limo_base-7] - odom topic name: 1
+[limo_base-7] - use_mcnamu_: 0
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK initializing
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK has been initialized
+[ydlidar_ros2_driver_node-8] [YDLIDAR] SDK Version: 1.2.7
+[limo_base-7] [INFO] [1772295399.487977255] [limo_base]: connet the serial port:'/dev/ttyTHS1'
+[limo_base-7] [INFO] [1772295399.492643060] [limo_base]: enableCommandedMode :
+[limo_base-7] [INFO] [1772295399.492743927] [limo_base]: Open the serial port:'/dev/ttyTHS1'
+[static_transform_publisher-6] [INFO] [1772295399.503536093] [base_link_to_imu_tf]: Spinning until stopped - publishing transform
+[static_transform_publisher-6] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-6] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-6] from 'base_link' to 'imu_link'
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'laser_link' material 'laser_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'depth_camera_link' material 'depth_camera_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'imu_link' material 'imu_material' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] [INFO] [1772295399.534548454] [robot_state_publisher]: got segment base_footprint
+[robot_state_publisher-1] [INFO] [1772295399.534930290] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-1] [INFO] [1772295399.534967603] [robot_state_publisher]: got segment depth_camera_link
+[robot_state_publisher-1] [INFO] [1772295399.534981811] [robot_state_publisher]: got segment depth_link
+[robot_state_publisher-1] [INFO] [1772295399.534991828] [robot_state_publisher]: got segment front_left_wheel_link
+[robot_state_publisher-1] [INFO] [1772295399.535001428] [robot_state_publisher]: got segment front_right_wheel_link
+[robot_state_publisher-1] [INFO] [1772295399.535009972] [robot_state_publisher]: got segment imu_link
+[robot_state_publisher-1] [INFO] [1772295399.535018805] [robot_state_publisher]: got segment inertial_link
+[robot_state_publisher-1] [INFO] [1772295399.535027733] [robot_state_publisher]: got segment laser_link
+[robot_state_publisher-1] [INFO] [1772295399.535036341] [robot_state_publisher]: got segment rear_left_wheel_link
+[robot_state_publisher-1] [INFO] [1772295399.535044981] [robot_state_publisher]: got segment rear_right_wheel_link
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar successfully connected [/dev/ttyUSB0:230400]
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar running correctly! The health status: good
+[joint_state_publisher-2] [INFO] [1772295400.159994025] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
+[ydlidar_ros2_driver_node-8] Current Lidar Model Code 151
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Baseplate device info
+[ydlidar_ros2_driver_node-8] Firmware version: 1.2
+[ydlidar_ros2_driver_node-8] Hardware version: 1
+[ydlidar_ros2_driver_node-8] Model: Tmini Plus
+[ydlidar_ros2_driver_node-8] Serial: 2024092600090187
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Current scan frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Lidar init success, Elapsed time 971 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Create thread 0x9B27E8E0
+[INFO] [async_slam_toolbox_node-9]: process started with pid [128280]
+[async_slam_toolbox_node-9] 2026-02-28 16:16:42.427 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
+[async_slam_toolbox_node-9] [INFO] [1772295402.472864308] [slam_toolbox]: Node using stack size 40000000
+[async_slam_toolbox_node-9] 2026-02-28 16:16:42.496 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to start scan mode, Elapsed time 2098 ms
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Scan Frequency: 10.00Hz
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Fixed Size: 400
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Sample Rate: 4.00K
+[ydlidar_ros2_driver_node-8] [YDLIDAR] Successed to check the lidar, Elapsed time 0 ms
+[ydlidar_ros2_driver_node-8] [2026-02-28 16:16:42][info] [YDLIDAR] Now lidar is scanning...
+[async_slam_toolbox_node-9] [INFO] [1772295402.572397614] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-9] [INFO] [1772295402.572952478] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
+[async_slam_toolbox_node-9] [WARN] [1772295403.069106059] [slam_toolbox]: minimum laser range setting (0.0 m) exceeds the capabilities of the used Lidar (0.0 m)
+[async_slam_toolbox_node-9] Registering sensor: [Custom Described Lidar]
+[async_slam_toolbox_node-9] LaserRangeScan contains 244 range readings, expected 245
+[async_slam_toolbox_node-9] LaserRangeScan contains 244 range readings, expected 245
+[ydlidar_ros2_driver_node-8] [WARN] [1772295547.211973447] [ydlidar_ros2_driver_node]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
 
 development/ros/ros2_ws took 2.2s …
-✦ ➜ 
+✦ ➜ ros2 node list | grep slam          
+/slam_toolbox
+
+development/ros/ros2_ws …
+✦ ➜ ros2 topic hz /map        
+2026-02-28 16:17:39.982 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
+
+development/ros/ros2_ws …
+✦ ➜ ros2 topic hz /map       
+2026-02-28 16:20:52.557 [RTPS_TRANSPORT_SHM Error] Failed init_port fastrtps_port17679: open_and_lock_file failed -> Function open_port_internal
+WARNING: topic [/map] does not appear to be published yet
