@@ -8,7 +8,7 @@ Version: 1.0.0
 Brief: Gazebo control plugins for the Blazerbot (LIMO Agile X) using differential drive.
        Subscribes to cmd_vel and publishes odom + tf in Gazebo for bridging to ROS 2.
 ~~~~~
-Last Modified: Tuesday, 17th February 2026 9:51:48 AM
+Last Modified: Thursday, 5th March 2026 5:28:26 PM
 Modified By: Zabdiel Addo
 ~~~~~
 Copyright ©2025 Zabdiel Addo. All rights reserved.

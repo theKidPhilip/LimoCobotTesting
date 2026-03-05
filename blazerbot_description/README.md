@@ -63,7 +63,7 @@ Based on AgileX LIMO:
 ```bash
 cd ~/development/ros/ros2_ws
 colcon build --packages-select blazerbot_description
-source install/setup.bash
+source install/setup.zsh
 ````
 
 ---

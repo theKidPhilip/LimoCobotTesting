@@ -2,29 +2,41 @@
 
 ## Overview
 
-This package implements **autonomous navigation** for the Blazerbot robot using the ROS2 Navigation Stack (Nav2). It uses **AMCL (Adaptive Monte Carlo Localization)** to localize the robot within a pre-built map, and the **Nav2 stack** for path planning and obstacle avoidance.
+This package implements **autonomous navigation** for the Blazerbot robot using the ROS2 Navigation Stack (Nav2). It uses:
 
-The robot autonomously navigates to predefined goals within the `wall_arena` Gazebo world without colliding with obstacles.
+- **AMCL (Adaptive Monte Carlo Localization)** to localize the robot within a **saved map**
+- The **Nav2 stack** for **path planning**, **path following**, and **obstacle avoidance**
+- A helper script (`goal_navigator.py`) to send predefined goals automatically
+
+You can also send goals manually in RViz using the **Nav2 Goal** arrow tool.
+
+---
 
 ## Package Structure
 
 ```
+
 blazerbot_navigation/
 ├── config/
 │   ├── amcl_params.yaml          # AMCL localization configuration
 │   ├── nav2_params.yaml          # Full Nav2 stack configuration
 │   └── nav_rviz_config.rviz      # RViz config for navigation visualization
 ├── launch/
-│   ├── localization.launch.py    # Launches map_server and AMCL
+│   ├── localization.launch.py    # Launches map_server + AMCL
 │   ├── navigation.launch.py      # Launches full Nav2 stack
-│   └── simulation.launch.py     # Master launch — world + robot + SLAM + Nav2
+│   └── simulation.launch.py      # Master launch (mode:=slam OR mode:=nav)
 ├── scripts/
 │   └── goal_navigator.py         # Sends predefined goals to Nav2
 ├── maps/
+│   ├── blazerbot_map.yaml        # Saved map metadata
+│   └── blazerbot_map.pgm         # Saved map image
 ├── CMakeLists.txt
 ├── package.xml
 └── README.md
-```
+
+````
+
+---
 
 ## Dependencies
 
@@ -41,33 +53,41 @@ Install if missing:
 
 ```bash
 sudo apt-get install ros-jazzy-navigation2 ros-jazzy-nav2-bringup
-```
+````
+
+---
 
 ## How It Works
 
-### Localization (AMCL)
+### 1) Localization (AMCL)
 
-- Loads the pre-built map from the `maps/` folder
-- Uses particle filter to estimate the robot's position within the map
-- Publishes the `map → odom` transform
-- Initial pose is set to `(0, 0, 0)` — the robot spawn point
+* Loads a **saved map** from `maps/`
+* Uses a particle filter to estimate the robot’s pose inside the map
+* Publishes the `map → odom` transform
+* Publishes estimated pose on `/amcl_pose`
 
-### Navigation (Nav2)
+### 2) Navigation (Nav2)
 
-- **Planner Server** — computes a global path from current position to goal using NavFn
-- **Controller Server** — follows the global path using DWB local planner
-- **Behavior Server** — handles recovery behaviors (spin, wait)
-- **BT Navigator** — orchestrates the full navigation using behavior trees
+* **Planner Server** computes a global path from current pose to the goal (`/plan`)
+* **Controller Server** follows that path by publishing velocity commands (`/cmd_vel`)
+* **Behavior Server** runs recovery behaviors (spin, back up, wait)
+* **BT Navigator** coordinates everything with a behavior tree
 
-### Goal Navigator Script
+### 3) Goal Sending Options
 
-Sends three predefined goals autonomously:
+You have two options:
 
-| Goal | X | Y | Description |
-|------|---|---|-------------|
-| Left Corridor | -1.0 | -1.0 | Left side of arena |
-| Right Corridor | 1.0 | 1.0 | Right side of arena |
-| Center | 0.0 | 0.0 | Center of arena |
+#### A) RViz Goal Arrow (Manual)
+
+* Use the **Nav2 Goal** tool in RViz
+* Click on the map and drag an arrow to set the goal direction (yaw)
+
+#### B) `goal_navigator.py` (Automatic)
+
+* Sends a list of predefined goals using the `NavigateToPose` action
+* Useful for demos and repeatable testing
+
+---
 
 ## Build
 
@@ -76,122 +96,138 @@ colcon build --packages-select blazerbot_navigation --symlink-install
 source install/setup.bash
 ```
 
+---
+
 ## Usage
 
-### Full Simulation Launch (Recommended)
+### Option 1 — Build/Update Map (SLAM Mode)
 
-Launches everything in one command — world, robot, SLAM and Nav2:
+This launches Gazebo + robot + SLAM (mapping). Use this only when generating a map.
 
 ```bash
-ros2 launch blazerbot_navigation simulation.launch.py
+ros2 launch blazerbot_navigation simulation.launch.py mode:=slam
 ```
 
-Wait ~20 seconds for all nodes to initialize, then run the goal navigator:
+Drive the robot around to explore, then save the map (using SLAM toolbox plugin or map_saver).
+
+> After saving, ensure the map files are in:
+>
+> `blazerbot_navigation/maps/blazerbot_map.yaml`
+> `blazerbot_navigation/maps/blazerbot_map.pgm`
+
+---
+
+### Option 2 — Navigate Using Saved Map (Nav Mode)
+
+This launches Gazebo + robot + **map_server + AMCL + Nav2** (navigation).
+
+```bash
+ros2 launch blazerbot_navigation simulation.launch.py mode:=nav
+```
+
+#### Send a goal using RViz (recommended demo)
+
+1. Open RViz using `nav_rviz_config.rviz`
+2. Set Fixed Frame to `map`
+3. Click **2D Pose Estimate** and set the robot’s initial pose
+4. Click **Nav2 Goal**, then click-and-drag the arrow to a destination
+
+#### Send goals automatically (goal_navigator script)
 
 ```bash
 ros2 run blazerbot_navigation goal_navigator.py
 ```
 
-### Individual Launch Files
+---
 
-**Localization only:**
+## Individual Launch Files
+
+### Localization only (map_server + AMCL)
 
 ```bash
 ros2 launch blazerbot_navigation localization.launch.py
 ```
 
-**Navigation stack only:**
+### Navigation stack only (planner/controller/BT)
 
 ```bash
 ros2 launch blazerbot_navigation navigation.launch.py
 ```
 
-### Sending Goals Manually via RViz
-
-1. Open RViz with the nav config
-2. Set fixed frame to `map`
-3. Click **Nav2 Goal** button in the toolbar
-4. Click anywhere on the map to send a goal
-
-### Sending Goals via Terminal
-
-```bash
-ros2 topic pub /goal_pose geometry_msgs/msg/PoseStamped \
-"{header: {frame_id: 'map'}, pose: {position: {x: 0.5, y: 0.5, z: 0.0}, orientation: {w: 1.0}}}" --once
-```
+---
 
 ## Topics
 
-| Topic | Type | Description |
-|-------|------|-------------|
-| `/map` | `nav_msgs/msg/OccupancyGrid` | Static map from map_server |
-| `/amcl_pose` | `geometry_msgs/msg/PoseWithCovarianceStamped` | Robot estimated pose |
-| `/particle_cloud` | `nav2_msgs/msg/ParticleCloud` | AMCL particles |
-| `/plan` | `nav_msgs/msg/Path` | Global planned path |
-| `/local_plan` | `nav_msgs/msg/Path` | Local planned path |
-| `/cmd_vel` | `geometry_msgs/msg/Twist` | Velocity commands to robot |
-| `/scan` | `sensor_msgs/msg/LaserScan` | LIDAR data for obstacle avoidance |
+| Topic             | Type                                          | Description              |
+| ----------------- | --------------------------------------------- | ------------------------ |
+| `/map`            | `nav_msgs/msg/OccupancyGrid`                  | Static map (map_server)  |
+| `/amcl_pose`      | `geometry_msgs/msg/PoseWithCovarianceStamped` | Robot estimated pose     |
+| `/particle_cloud` | `nav2_msgs/msg/ParticleCloud`                 | AMCL particles           |
+| `/plan`           | `nav_msgs/msg/Path`                           | Global path from planner |
+| `/cmd_vel`        | `geometry_msgs/msg/Twist`                     | Velocity commands        |
+| `/scan`           | `sensor_msgs/msg/LaserScan`                   | LIDAR data for obstacles |
 
-## Key Parameters
+---
 
-### AMCL
+## Quick Verification Commands
 
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `min_particles` | `500` | Minimum particle count |
-| `max_particles` | `2000` | Maximum particle count |
-| `base_frame_id` | `base_link` | Robot base frame |
-| `laser_model_type` | `likelihood_field` | Laser sensor model |
+Check Nav2 action exists:
 
-### Nav2
-
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `max_vel_x` | `0.26` | Maximum linear velocity |
-| `max_vel_theta` | `1.0` | Maximum angular velocity |
-| `xy_goal_tolerance` | `0.25` | Goal position tolerance (m) |
-| `yaw_goal_tolerance` | `0.25` | Goal orientation tolerance (rad) |
-| `inflation_radius` | `0.55` | Obstacle inflation radius |
-
-## Navigation Stack Architecture
-
+```bash
+ros2 action list | grep navigate
 ```
-goal_navigator.py
-      ↓
-/navigate_to_pose (action)
-      ↓
-bt_navigator (behavior tree)
-      ↓
-planner_server ──→ global path ──→ controller_server ──→ /cmd_vel
-      ↑                                    ↑
-global_costmap                      local_costmap
-      ↑                                    ↑
-    /map                                /scan
+
+Check robot is being commanded during navigation:
+
+```bash
+ros2 topic hz /cmd_vel
 ```
+
+Check AMCL is publishing pose:
+
+```bash
+ros2 topic hz /amcl_pose
+```
+
+---
 
 ## Troubleshooting
 
-**Robot not moving:**
+### Robot not moving
+
+* Ensure Nav2 nodes are ACTIVE:
 
 ```bash
-ros2 lifecycle list bt_navigator  # Should show active
-ros2 action list                  # Should show /navigate_to_pose
+ros2 lifecycle list
 ```
 
-**Goals outside map bounds:**
-
-- Remap the environment using `blazerbot_slam`
-- Check `maps/blazerbot_map.yaml` for map dimensions
-
-**AMCL not localizing:**
+* Ensure `/cmd_vel` publishes when a goal is sent:
 
 ```bash
-ros2 topic hz /amcl_pose  # Should be publishing
-ros2 topic hz /scan       # Should be ~5-10Hz
+ros2 topic hz /cmd_vel
 ```
+
+### AMCL not localizing
+
+* In RViz, always set **2D Pose Estimate** once before sending a Nav2 Goal.
+* Check `/scan` and `/amcl_pose` frequency:
+
+```bash
+ros2 topic hz /scan
+ros2 topic hz /amcl_pose
+```
+
+### Goal rejected
+
+* Confirm the goal is within the map bounds.
+* Confirm TF is healthy: `map → odom → base_link → laser_link`
+
+---
 
 ## Authors
 
 Zabdiel Addo, Philip Quartey
 CS353 – Introduction to AI Robotics
 Ashesi University
+
+

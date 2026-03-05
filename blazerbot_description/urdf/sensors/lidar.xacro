@@ -9,8 +9,8 @@ Version: 1.1.0
 Brief: Implements a LiDAR sensor for the Blazerbot (LIMO Agile X) URDF model.
        Publishes LaserScan data in Gazebo on the "scan" topic for wall following.
 ~~~~~
-Last Modified: Tuesday, 24th February 2026 5:26:33 PM
-Modified By: Philip Quartey
+Last Modified: Saturday, 28th February 2026 4:01:01 AM
+Modified By: Zabdiel Addo
 ~~~~~
 Copyright ©2025 Zabdiel Addo. All rights reserved.
 -->
@@ -124,7 +124,7 @@ Copyright ©2025 Zabdiel Addo. All rights reserved.
                 <pose>0 0 ${lidar_sensor_origin} 0 0 0</pose>
                 <always_on>true</always_on>
                 <visualize>true</visualize>
-                <update_rate>10</update_rate>
+                <update_rate>20</update_rate>
 
                 <lidar>
                     <scan>

@@ -27,7 +27,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'use_sim_time': use_sim_time,
-            'world': 'wall_arena',
+            'world': 'guided_maze',
             'start_gazebo': 'true',
         }.items()
     )
@@ -71,7 +71,7 @@ def generate_launch_description():
         ),
 
         spawn_launch,
-        TimerAction(period=8.0,  actions=[slam_launch]),
+        # TimerAction(period=8.0,  actions=[slam_launch]),
         TimerAction(period=15.0, actions=[localization_launch]),
-        TimerAction(period=20.0, actions=[navigation_launch]),
+        TimerAction(period=25.0, actions=[navigation_launch]),
     ])

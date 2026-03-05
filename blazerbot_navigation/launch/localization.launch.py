@@ -17,11 +17,9 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     nav_pkg = get_package_share_directory('blazerbot_navigation')
+    slam_pkg = get_package_share_directory('blazerbot_slam')
 
-    map_file = os.path.join(
-        os.path.expanduser('~'),
-        'development/ros/ros2_ws/src/lab-4-navigation-limo-blazers/maps/blazerbot_map.yaml'
-    )
+    map_file = os.path.join(slam_pkg, 'maps', 'wall_arena_map.yaml')
 
     amcl_params = os.path.join(nav_pkg, 'config', 'amcl_params.yaml')
 
@@ -41,7 +39,8 @@ def generate_launch_description():
             output='screen',
             parameters=[
                 {'use_sim_time': use_sim_time},
-                {'yaml_filename': map_file}
+                {'yaml_filename': map_file},
+                {'use_transient_local': True}
             ]
         ),
 

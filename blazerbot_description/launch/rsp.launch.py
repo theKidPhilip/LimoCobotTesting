@@ -5,17 +5,15 @@ File Created: Tuesday, 17th February 2026
 Author: Zabdiel Addo
 Email: zabdiel.addo@ashesi.edu.gh
 Version: 1.0.0
-Brief: Launch file to start robot_state_publisher for Blazerbot (LIMO AgileX).
-       Expands xacro -> URDF and publishes it to /robot_description, then publishes TF.
+Brief: Launch file to start robot_state_publisher for Blazerbot 
 -----
-Last Modified: Tuesday, 17th February 2026 12:52:09 AM
+Last Modified: Thursday, 26th February 2026 8:48:19 PM
 Modified By: Zabdiel Addo
 -----
 Copyright ©2026 Zabdiel Addo.
 """
 
 from os.path import join
-
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import Command, LaunchConfiguration
@@ -108,8 +106,7 @@ def launch_setup(context):
 def generate_launch_description():
     pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
 
-    # Update this to whatever RViz config you actually have.
-    # If you don't have one yet, you can create rviz/blazerbot.rviz later.
+    # Update this to whatever RViz config you have
     default_rviz_config = join(pkg_share, "rviz", "blazerbot.rviz")
 
     return LaunchDescription(

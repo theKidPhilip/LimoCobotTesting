@@ -11,10 +11,6 @@ Brief:
    - Starts robot_state_publisher (sim time)
    - Starts ros_gz_bridge using gz_bridge.yaml
    - Optionally starts RViz
-
-Fix (v1.0.1):
-  - Fix GZ_SIM_RESOURCE_PATH so Gazebo can resolve model://blazerbot_description/...
-    after URDF->SDF conversion (adds the parent "share" directory and description paths).
 """
 
 import subprocess
@@ -88,18 +84,8 @@ def launch_setup(context: LaunchContext) -> list:
     pitch = LaunchConfiguration("pitch").perform(context)
     yaw = LaunchConfiguration("yaw").perform(context)
 
-    # ----------------------------
-    # FIX: Resource path for models
-    # ----------------------------
-    # After "gz sdf -p", Gazebo often rewrites package://... to model://<pkg>/...
-    # That means Gazebo needs a resource root that contains "<pkg>" as a folder.
-    #
-    # description_share:
-    #   .../install/blazerbot_description/share/blazerbot_description
-    # share_parent:
-    #   .../install/blazerbot_description/share
-    #
-    # Putting share_parent on GZ_SIM_RESOURCE_PATH lets model://blazerbot_description/... resolve.
+    # Resource path for models
+
     share_parent = dirname(description_share)
 
     desc_root = description_share
@@ -173,6 +159,7 @@ def launch_setup(context: LaunchContext) -> list:
         name="ros_gz_bridge",
         output="screen",
         arguments=["--ros-args", "-p", f"config_file:={bridge_params}"],
+        parameters=[{"use_sim_time": True}],  # ← add this line
     )
 
     # 5) RViz (optional)
@@ -202,9 +189,9 @@ def launch_setup(context: LaunchContext) -> list:
 def generate_launch_description() -> LaunchDescription:
     return LaunchDescription(
         [
-            DeclareLaunchArgument("x", default_value="0.0",
+            DeclareLaunchArgument("x", default_value="-1.30",
                                   description="Spawn X (m)"),
-            DeclareLaunchArgument("y", default_value="0.0",
+            DeclareLaunchArgument("y", default_value="-1.30",
                                   description="Spawn Y (m)"),
             DeclareLaunchArgument("z", default_value="0.10",
                                   description="Spawn Z (m)"),
@@ -216,7 +203,7 @@ def generate_launch_description() -> LaunchDescription:
                                   description="Spawn yaw (rad)"),
             DeclareLaunchArgument(
                 "world",
-                default_value="empty",
+                default_value="guided_maze",
                 description="World name (expects ashbot_world/worlds/<world>.world)",
             ),
             DeclareLaunchArgument(
@@ -227,7 +214,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 "rviz",
-                default_value="true",
+                default_value="false",
                 choices=["true", "false"],
                 description="Launch RViz if true",
             ),
